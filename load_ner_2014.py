@@ -42,9 +42,9 @@ def load_ner_dataset(path, subset):
   dataDict[subset]["tokens"] = sentences
   dataDict[subset]["ner_tags_str"] = labels
   
-load_ner_dataset("I2B22014NER/train.txt.conll", "train")
-load_ner_dataset("I2B22014NER/dev.txt.conll", "validation")
-load_ner_dataset("I2B22014NER/test.txt.conll", "test")
+load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22014NER/train.txt.conll", "train")
+load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22014NER/dev.txt.conll", "validation")
+load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22014NER/test.txt.conll", "test")
 
 allLabels = list(set(allLabels))
 label_to_index = {label: index for index, label in enumerate(allLabels)}
@@ -59,4 +59,4 @@ dataset = ds.DatasetDict(dataDict)
 
 print(dataset)
 
-dataset.save_to_disk("i2b2-2014/")
+dataset.save_to_disk("/mnt/sdd/niallt/bio-lm/data/tasks/i2b2-2014_hf_dataset/")

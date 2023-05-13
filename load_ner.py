@@ -2,6 +2,8 @@ import transformers as ts
 import datasets as ds
 import pickle
 
+#TODO - improve readability by adding argument parsing
+
 allLabels = []
 
 dataDict = {}
@@ -43,9 +45,9 @@ def load_ner_dataset(path, subset):
   dataDict[subset]["tokens"] = sentences
   dataDict[subset]["ner_tags_str"] = labels
   
-load_ner_dataset("I2B22010NER/train.txt.conll", "train")
-load_ner_dataset("I2B22010NER/dev.txt.conll", "validation")
-load_ner_dataset("I2B22010NER/test.txt.conll", "test")
+load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22010NER/train.txt.conll", "train")
+load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22010NER/dev.txt.conll", "validation")
+load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22010NER/test.txt.conll", "test")
 
 allLabels = list(set(allLabels))
 label_to_index = {label: index for index, label in enumerate(allLabels)}
@@ -62,4 +64,4 @@ print(label_to_index)
 
 #print(dataset)
 
-#dataset.save_to_disk("i2b2-2010/")
+dataset.save_to_disk("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22010NER_hf_dataset/")
