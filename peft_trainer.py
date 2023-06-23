@@ -27,7 +27,22 @@ import numpy as np
 import argparse
 import yaml
 import json
+from datetime import datetime
 from scipy.special import softmax
+
+
+'''
+Script to train a prefix-tuning model on a given dataset. 
+
+Example usage:
+# custom models:
+ -> /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/
+ -> /mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-wecho/sampled_250000/08-03-2023--13-06/checkpoint-84000/
+ -> /mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000
+
+python peft_trainer.py --task icd9-triage-no-category-in-text --training_size fewshot --few_shot_n 64 --model_name_or_path /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/
+
+'''
 
 # setup main function
 def main():
@@ -36,11 +51,11 @@ def main():
 
     # Required parameters
     parser.add_argument("--training_data_dir",
-                        default = "/mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/",# triage = /mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/
+                        default = "/mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/no_category_in_text/",# triage = /mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/
                         type=str,
                         help = "The data path containing the dataset to use")
     parser.add_argument("--eval_data_dir",
-                        default = "/mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/",# triage = /mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/
+                        default = "/mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/no_category_in_text/",# triage = /mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/
                         type=str,
                         help = "The data path containing the dataset to use")
     parser.add_argument("--cache_dir",
@@ -78,7 +93,7 @@ def main():
                         help = "The data path to save tb log files to"
                         )
     parser.add_argument("--ckpt_save_dir",
-                    default = "/mnt/sdc/niallt/saved_models/peft_training/logs/",
+                    default = "/mnt/sdc/niallt/saved_models/peft_training/ckpts/",
                     type=str,
                     help = "The data path to save trained ckpts to"
                     )
@@ -96,6 +111,11 @@ def main():
                         default = 100,
                         type=int,
                         help = "The max number of training steps before the trainer will terminate")
+    parser.add_argument("--eval_accumulation_steps",
+                        default = 50,
+                        type=int,
+                        help = """ Number of predictions steps to accumulate the output tensors for, before moving the results to the CPU. If left unset,
+                                the whole predictions are accumulated on GPU/TPU before being moved to the CPU""")
     parser.add_argument("--eval_every_steps",
                         default = 100,
                         type=int,
@@ -117,7 +137,7 @@ def main():
                         type=int,
                         help = "the size of evaluation batches")
     parser.add_argument("--max_epochs",
-                        default = 3,
+                        default = 1,
                         type=int,
                         help = "the maximum number of epochs to train for")
     parser.add_argument("--accumulate_grad_batches",
@@ -329,6 +349,9 @@ def main():
     eval_batch_size = args.eval_batch_size
     num_epochs = args.max_epochs
     
+    # set up some variables to add to checkpoint and logs filenames
+    time_now = str(datetime.now().strftime("%d-%m-%Y--%H-%M"))
+    
     
     
     # define some model specific params for logs etc - this is mainly for custom local models
@@ -346,6 +369,8 @@ def main():
                 model_name = model_name_or_path.split("/")[7] + "/declutr/" + model_name_or_path.split("/")[-3]
         elif "contrastive" in model_name_or_path or "custom_pretraining" in model_name_or_path:
             model_name = model_name_or_path.split("/")[7]
+        elif "simcse" in model_name_or_path:# change this to be dynamic
+            model_name = "simcse-mimic"
         else:
             model_name = model_name_or_path.split("/")[7]
     else:    
@@ -354,12 +379,16 @@ def main():
     
      
     # set up logging and ckpt dirs
-    logging_dir = f"{log_save_dir}/{task}/fewshot_{few_shot_n}/{model_name}/"
-    ckpt_dir = f"{ckpt_save_dir}/{task}/fewshot_{few_shot_n}/{model_name}/"  
+    logging_dir = f"{log_save_dir}/{task}/fewshot_{few_shot_n}/{model_name}/{peft_method}/{time_now}/"
+    ckpt_dir = f"{ckpt_save_dir}/{task}/fewshot_{few_shot_n}/{model_name}/{peft_method}/{time_now}/"
+    
+    loguru_logger.info(f"Logging to: {logging_dir}")
+    loguru_logger.info(f"Saving ckpts to: {ckpt_dir}")  
     
     # update training data dir based on few shot
     if args.training_size == "fewshot":
-        training_data_dir = f"{training_data_dir}/fewshot_{few_shot_n}/" 
+        training_data_dir = f"{training_data_dir}/fewshot_{few_shot_n}/"
+        loguru_logger.info(f"Training data dir updated to: {training_data_dir}") 
     
         
     if args.saving_strategy != "no":
@@ -398,6 +427,8 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, padding_side=padding_side)
     if getattr(tokenizer, "pad_token_id") is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
+        
+    print(f"tokenizer is: {tokenizer}")
 
     # set up data keys
     sentence1_key, sentence2_key = task_to_keys[task]
@@ -509,8 +540,13 @@ def main():
         
 
     # load peft model    
-    model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, num_labels = num_labels,return_dict=True)
-    #FIXME - at moment the model changes after get_peft_model and this seems to throw how the trainer interacts with it...
+    model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path,
+                                                                num_labels = num_labels,
+                                                                output_hidden_states=False, # if true will lead to GPU OOM error
+                                                                return_dict=True)
+    
+    #FIXME - at moment when using custom roberta it ledas to GPU OOM error during evaluation loop
+    #########uncomment below for PEFT models#########
     model = get_peft_model(model, peft_config)
     print(f"peft config is: {peft_config}")
     print(model)
@@ -555,12 +591,13 @@ def main():
         logging_dir = f"{logging_dir}/",
         save_total_limit=2,
         report_to = 'tensorboard',        
-        overwrite_output_dir=True,         
+        overwrite_output_dir=True,
+        # eval_accumulation_steps=32,         
         # will avoid building up lots of files
         no_cuda = args.no_cuda, # for cpu only
         # use_ipex = args.use_ipex # for cpu only
-        remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
-        label_names = ["labels"],#FIXME - this is a hack to get around the fact that the peft model changes the output format and this causes issues with the trainer
+        # remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
+        # label_names = ["labels"],#FIXME - this is a hack to get around the fact that the peft model changes the output format and this causes issues with the trainer
     )
     
     # setup normal trainer
@@ -587,7 +624,10 @@ def main():
         yaml.dump(args.__dict__, f) 
     # also save trainer args
     with open(f'{logging_dir}/all_trainer_args.yaml', 'w') as f:
-        yaml.dump(trainer.args.__dict__, f)    
+        yaml.dump(trainer.args.__dict__, f)   
+        
+    # save the peft weights to a file
+    model.save_pretrained(f"{ckpt_dir}")
 
 # run script
 if __name__ == "__main__":
