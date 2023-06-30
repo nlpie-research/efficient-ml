@@ -60,3 +60,9 @@ dataset = ds.DatasetDict(dataDict)
 print(dataset)
 
 dataset.save_to_disk("/mnt/sdd/niallt/bio-lm/data/tasks/i2b2-2012_hf_dataset/")
+
+loaded_dataset = ds.load_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/i2b2-2012_hf_dataset/")
+
+print(f"loaded_dataset: {loaded_dataset}")
+
+
