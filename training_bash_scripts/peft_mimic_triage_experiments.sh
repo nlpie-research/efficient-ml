@@ -60,7 +60,7 @@ for model in "${model_name_or_path[@]}"
             --max_epochs $max_epochs \
             --data_dir $data_dir \
             --task $task \
-            --task_type TKN_CLS \
+            --task_type TOKEN_CLS \
             --peft_method $peft_method \
             --log_save_dir $log_save_dir \
             --ckpt_save_dir $ckpt_save_dir

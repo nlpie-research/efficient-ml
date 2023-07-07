@@ -50,7 +50,7 @@ python peft_trainer.py
 
 class DatasetInfo:
   def __init__(self, name,
-               type="ner", 
+               ds_type="ner", 
                metric=None, 
                load_from_disk=True,
                isMultiSentence=False, 
@@ -69,7 +69,7 @@ class DatasetInfo:
     self.epochs = epochs
     self.runs = runs
     self.load_from_disk = load_from_disk
-    self.type = type
+    self.type = ds_type
     self.num_labels = num_labels
 
     if metric == None:
@@ -173,6 +173,7 @@ def parse_args() -> argparse.Namespace:
                         help="name of dataset")
     parser.add_argument("--task_type",
                         default="SEQ_CLS", # SEQ-CLS
+                        choices=["SEQ_CLS", "TOKEN_CLS"],
                         type=str,
                         help="name of dataset")
     parser.add_argument("--evaluation_strategy",
@@ -427,7 +428,7 @@ def load_datasets(info:DatasetInfo, tokenizer:AutoTokenizer) -> tuple:
 
     return tokenizedTrainDataset, tokenizedValDatasets, num_labels, dataset["info"][0]["all_ner_tags"]
 
-def compute_tkn_cls_metrics(eval_pred, label_list, metric):
+def compute_token_cls_metrics(eval_pred, label_list, metric):
     predictions, labels = eval_pred
     # print(f"logits shape: {predictions.shape}")
     # print(f"labels: {labels}")
@@ -579,13 +580,13 @@ def main() -> None:
     
     tokenizer = AutoTokenizer.from_pretrained(**tokenizer_args)
     
-    # if task_type == "SEQ_CLS":
-    #     if getattr(tokenizer, "pad_token_id") is None:
-    #         tokenizer.pad_token_id = tokenizer.eos_token_id
-    #     def collate_fn(examples):
-    #         return tokenizer.pad(examples, padding="longest", return_tensors="pt")
-    # else:    
-    #     collate_fn = DataCollatorForTokenClassification(tokenizer)
+    if task_type == "SEQ_CLS":
+        if getattr(tokenizer, "pad_token_id") is None:
+            tokenizer.pad_token_id = tokenizer.eos_token_id
+        def collate_fn(examples):
+            return tokenizer.pad(examples, padding="longest", return_tensors="pt")
+    else:    
+        collate_fn = DataCollatorForTokenClassification(tokenizer)
 
     ######################### Data setup #########################
     loguru_logger.info("Loading data")
@@ -598,7 +599,7 @@ def main() -> None:
             ds_type = "ner"
         ds_info = DatasetInfo(name=data_dir, 
                     metric="f1", load_from_disk=True,
-                    type=ds_type, isMultiSentence=False,
+                    ds_type=ds_type, isMultiSentence=False,
                     lr=[5e-5, 2e-5, 1e-5], epochs=3,
                     batch_size=[train_batch_size],
                     runs=1)
@@ -608,6 +609,13 @@ def main() -> None:
         tokenized_datasets["validation"] = data_tuple[1][0]
         num_labels = data_tuple[2]
         all_ner_tags = data_tuple[3]
+
+    print(f'Sample train data:\n{tokenized_datasets["train"][10]}')
+    print(f'\nSample train data (decoded):'+
+            f'{tokenizer.decode(tokenized_datasets["train"][10]["input_ids"])}')        
+    # print length of datasets
+    print(f"tokenized datasets:\n {tokenized_datasets['validation']}")
+    print(f"tokenized datasets:\n {tokenized_datasets['train']}")
 
     ######################### Model setup #########################
     loguru_logger.info("Setting up model")
@@ -619,7 +627,7 @@ def main() -> None:
                                 model_name_or_path, num_labels = num_labels,
                                 output_hidden_states=False,
                                 return_dict=True)
-    elif task_type == "TKN_CLS":
+    elif task_type == "TOKEN_CLS":
         model = AutoModelForTokenClassification.from_pretrained(
                                 model_name_or_path, num_labels=num_labels,
                                 output_hidden_states=False,
@@ -651,40 +659,14 @@ def main() -> None:
     
     monitor_metric_name = "f1_macro"
     
-    # if task_type == "SEQ_CLS":
-    #    compute_metrics = compute_seq_cls_metrics
-    # else:
-    #    metric = evaluate.load("seqeval")
-    # #    compute_metrics = partial(compute_tkn_cls_metrics, 
-    # #                              label_list=all_ner_tags, 
-    # #                              metric=metric)
-    label_list = all_ner_tags
-    metric = evaluate.load("seqeval")
-    def compute_tkn_cls_metrics(eval_pred):
-        predictions, labels = eval_pred
-        # print(f"logits shape: {predictions.shape}")
-        # print(f"labels: {labels}")
-        predictions = np.argmax(predictions, axis=2)
-        # print(f"predictions: {predictions}")
-        # Remove ignored index (special tokens)
-        true_predictions = [
-            [label_list[p] for (p, l) in zip(prediction, label) if l != -100]
-            for prediction, label in zip(predictions, labels)
-        ]
-        # print(f"True predictions: {true_predictions}")
-        true_labels = [
-            [label_list[l] for (p, l) in zip(prediction, label) if l != -100]
-            for prediction, label in zip(predictions, labels)
-        ]
-        # print(f"True labels: {true_labels}")
-        results = metric.compute(predictions=true_predictions, references=true_labels)
-        return {
-            "precision": results["overall_precision"],
-            "recall": results["overall_recall"],
-            "f1": results["overall_f1"],
-            "accuracy": results["overall_accuracy"],
-        }
-
+    if task_type == "SEQ_CLS":
+       compute_metrics = compute_seq_cls_metrics
+    else:
+       metric = evaluate.load("seqeval")
+       compute_metrics = partial(compute_token_cls_metrics, 
+                                 label_list=all_ner_tags, 
+                                 metric=metric)
+    
     train_args = TrainingArguments(
         output_dir = f"{ckpt_dir}/",
         evaluation_strategy = args.evaluation_strategy,
@@ -708,17 +690,9 @@ def main() -> None:
         # will avoid building up lots of files
         no_cuda = args.no_cuda, # for cpu only
         # use_ipex = args.use_ipex # for cpu only
-        remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
+        # remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
         # label_names = ["labels"],#FIXME - this is a hack to get around the fact that the peft model changes the output format and this causes issues with the trainer
     )
-    
-    collate_fn = DataCollatorForTokenClassification(tokenizer)
-    print(f'Sample train data:\n{tokenized_datasets["train"][6611]}')
-    print(f'\nSample train data (decoded):'+
-            f'{tokenizer.decode(tokenized_datasets["train"][6611]["input_ids"])}')        
-    # print length of datasets
-    print(f"tokenized datasets:\n {tokenized_datasets['validation']}")
-    print(f"tokenized datasets:\n {tokenized_datasets['train']}")
     
     # setup normal trainer
     trainer = Trainer(
@@ -727,7 +701,7 @@ def main() -> None:
         train_dataset=tokenized_datasets["train"],
         eval_dataset=tokenized_datasets["validation"],
         tokenizer=tokenizer,
-        compute_metrics=compute_tkn_cls_metrics,         
+        compute_metrics=compute_metrics,         
         data_collator=collate_fn,
         optimizers =(optimizer, lr_scheduler)
         )
