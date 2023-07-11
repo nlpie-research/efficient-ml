@@ -15,12 +15,15 @@ from peft import (
     PrefixTuningConfig,
     PromptEncoderConfig,
     PromptTuningConfig,
+    prepare_model_for_int8_training,
 )
 
 
 import evaluate
 from datasets import load_dataset
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup, set_seed, Trainer, TrainingArguments
+from transformers import (LlamaForSequenceClassification,
+                        LlamaTokenizer)
 from tqdm import tqdm
 from loguru import logger as loguru_logger
 import numpy as np
@@ -59,7 +62,7 @@ def main():
                         type=str,
                         help = "The data path containing the dataset to use")
     parser.add_argument("--cache_dir",
-                        default = "/mnt/sdc/niallt/.cache/",
+                        default = None, #"/mnt/sdc/niallt/.cache/"
                         type=str,
                         help = "The data path to the directory containing the notes and referral data files")
 
@@ -271,7 +274,7 @@ def main():
         default="LORA", # LORA, PREFIX_TUNING, PROMPT_TUNING, P_TUNING
         type=str,
         help="Which peft method to use"
-    )   
+    )
 
     parser.add_argument(
         "--few_shot_n",
@@ -303,6 +306,11 @@ def main():
         action = "store_true",        
         help='Whether to use cuda/gpu or just use CPU '
     )
+    parser.add_argument(
+        '--eight_bit_training',
+        action = "store_true",        
+        help='Whether to run in 8bit - very needed for llama 7b etc'
+    )
 
     parser.add_argument('--task_to_keys',
         default = {
@@ -323,6 +331,8 @@ def main():
         type = dict,
         help = "mapping of task name to tuple of the note formats"
     )
+    
+    
 
     # TODO - add an argument to specify whether using balanced data then update directories based on that
     args = parser.parse_args()
@@ -348,6 +358,7 @@ def main():
     train_batch_size = args.train_batch_size
     eval_batch_size = args.eval_batch_size
     num_epochs = args.max_epochs
+    eight_bit_training = args.eight_bit_training
     
     # set up some variables to add to checkpoint and logs filenames
     time_now = str(datetime.now().strftime("%d-%m-%Y--%H-%M"))
@@ -423,8 +434,12 @@ def main():
         padding_side = "left"
     else:
         padding_side = "right"
-
-    tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, padding_side=padding_side)
+    if "llama" in model_name_or_path:
+        loguru_logger.info("Using llama tokenizer")
+        tokenizer = LlamaTokenizer.from_pretrained(model_name_or_path, padding_side=padding_side)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, padding_side=padding_side)
+    
     if getattr(tokenizer, "pad_token_id") is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
         
@@ -492,6 +507,10 @@ def main():
         pred_scores = softmax(logits, axis = -1)        
         predictions = np.argmax(logits, axis = -1)
         
+        # print(f"Pred scores are: {pred_scores} \n")
+        # print(f"Labels are: {labels}\n")
+        # print(f"Preds are: {predictions}")
+        
         # print(f"Labels are: {labels}\n")
         # print(f"Preds are: {predictions}")
         precision = precision_score.compute(predictions=predictions, references=labels, average = "macro")["precision"]
@@ -522,6 +541,25 @@ def main():
         peft_type = PeftType.LORA
         lr = 3e-4
         peft_config = LoraConfig(task_type=task_type, inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1)
+        if "falcon" in model_name_or_path:
+            loguru_logger.info("Using falcon config")
+            lora_alpha = 16
+            lora_dropout = 0.1
+            lora_r = 64
+
+            peft_config = LoraConfig(
+                lora_alpha=lora_alpha,
+                lora_dropout=lora_dropout,
+                r=lora_r,
+                bias="none",
+                task_type=task_type,
+                target_modules=[
+                    "query_key_value",
+                    "dense",
+                    "dense_h_to_4h",
+                    "dense_4h_to_h",
+                ]
+            )
     elif peft_method == "PREFIX_TUNING":
         loguru_logger.info("Using PREFIX_TUNING")
         peft_type = PeftType.PREFIX_TUNING
@@ -537,24 +575,52 @@ def main():
         peft_type = PeftType.P_TUNING
         peft_config = PromptEncoderConfig(task_type=task_type, num_virtual_tokens=20, encoder_hidden_size=128)
         lr = 1e-3
-        
-
-    # load peft model    
-    model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path,
-                                                                num_labels = num_labels,
-                                                                output_hidden_states=False, # if true will lead to GPU OOM error
-                                                                return_dict=True)
     
-    #FIXME - at moment when using custom roberta it ledas to GPU OOM error during evaluation loop
+    # if we forgot - we need to ensure it is on for llama models
+    if "llama" in model_name_or_path:
+        eight_bit_training = True
+        
+    if eight_bit_training:
+        loguru_logger.info("Using 8 bit training")
+        
+            
+        # model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path,
+        #                                                            torch_dtype=torch.bfloat16,
+        #                                                            num_labels = num_labels,return_dict=True)
+        # 8 bit
+        model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, num_labels=num_labels, torch_dtype=torch.float16, 
+                                                              load_in_8bit=True, output_hidden_states=False,                                                                
+                                                                device_map="auto",
+                                                                trust_remote_code = True,
+                                                                )
+        
+        if "falcon" in model_name_or_path:
+            model.config.use_cache = False
+            model.config.pad_token_id = tokenizer.pad_token_id
+        fp16_flag = True
+        prepare_model_for_int8_training(model)
+    else:
+        
+        model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path,
+                                                                   num_labels = num_labels, 
+                                                                   output_hidden_states=False,
+                                                                   return_dict=True)
+        
+        fp16_flag = False
+        model.to(device)
+    
+    
     #########uncomment below for PEFT models#########
+    
     model = get_peft_model(model, peft_config)
     print(f"peft config is: {peft_config}")
     print(model)
     model.print_trainable_parameters()
     
        
-    model.to(device)
+    # model.to(device)
     
+    #NOTE below is now handeled directly by the HF trainer - it defaults to same really
     # setup optimizer and lr_scheduler
     optimizer = AdamW(params=model.parameters(), lr=lr)    
 
@@ -579,11 +645,12 @@ def main():
         eval_steps = args.eval_every_steps,
         logging_steps = args.log_every_steps,
         logging_first_step = True,    
-        save_strategy = args.saving_strategy,
+        save_strategy = "no", # we don't want to save whole model
         save_steps = args.save_every_steps,        
         per_device_train_batch_size = train_batch_size,
         per_device_eval_batch_size = eval_batch_size,
         num_train_epochs=args.max_epochs,
+        learning_rate=lr,
         weight_decay=0.01,
         load_best_model_at_end=False,
         metric_for_best_model=monitor_metric_name,
@@ -592,8 +659,7 @@ def main():
         save_total_limit=2,
         report_to = 'tensorboard',        
         overwrite_output_dir=True,
-        # eval_accumulation_steps=32,         
-        # will avoid building up lots of files
+        fp16=fp16_flag,
         no_cuda = args.no_cuda, # for cpu only
         # use_ipex = args.use_ipex # for cpu only
         # remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
@@ -609,8 +675,19 @@ def main():
         tokenizer=tokenizer,
         compute_metrics=compute_metrics,         
         data_collator= collate_fn,
-        optimizers = (optimizer, lr_scheduler),
+        # optimizers = (optimizer, lr_scheduler),#NOTE we let HF use defaults given the lr now
         )
+    
+    if "llama" in model_name_or_path:
+        model.config.use_cache = False
+        old_state_dict = model.state_dict
+        model.state_dict = (
+            lambda self, *_, **__: get_peft_model_state_dict(
+                self, old_state_dict()
+            )
+        ).__get__(model, type(model))
+
+        model = torch.compile(model)
     # run training
     trainer.train()
     
