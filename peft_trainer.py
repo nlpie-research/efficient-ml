@@ -1,6 +1,6 @@
 import argparse
-from functools import partial
 import os
+from functools import partial
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0" 
 # 6,7
@@ -20,19 +20,18 @@ from loguru import logger as loguru_logger
 from peft import (LoraConfig, PeftType, PrefixTuningConfig,
                   PromptEncoderConfig, PromptTuningConfig, TaskType,
                   get_peft_config, get_peft_model, get_peft_model_state_dict,
-                  set_peft_model_state_dict, prepare_model_for_int8_training, prepare_model_for_kbit_training)
+                  prepare_model_for_int8_training,
+                  prepare_model_for_kbit_training, set_peft_model_state_dict)
 from scipy.special import softmax
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
-                          AutoModelForTokenClassification,
+from transformers import (AutoModelForSequenceClassification,
+                          AutoModelForTokenClassification, AutoTokenizer,
                           DataCollatorForTokenClassification,
+                          LlamaForSequenceClassification, LlamaTokenizer,
                           Trainer, TrainingArguments,
                           get_linear_schedule_with_warmup, set_seed)
-
-from transformers import (LlamaForSequenceClassification,
-                        LlamaTokenizer)
 
 '''
 Script to train a prefix-tuning model on a given dataset. 
@@ -83,6 +82,7 @@ class DatasetInfo:
     self.fullName = name + "-" + self.metric
 
 def parse_args() -> argparse.Namespace:
+
     parser = argparse.ArgumentParser()
     # Required parameters
     parser.add_argument("--data_dir",
@@ -298,8 +298,20 @@ def get_model_name(model_name_or_path:str) -> str:
     
     return model_name
 
-def get_dataset_directory_details(args:argparse.Namespace) -> tuple:
-    return NotImplementedError   
+def get_dataset_directory_details(args:argparse.Namespace) -> argparse.Namespace:
+
+    with open('datasets.yaml', 'r') as f:
+        datasets = yaml.load(f, yaml.FullLoader)
+    
+    try:
+        dataset_info = datasets[args.task]
+        for k, v in dataset_info.items():
+            setattr(args, k, v)
+    except KeyError:
+        print(f"Task name {args.task} not in datasets.yaml. Available tasks are: {list(datasets.keys())}")
+        exit(0)
+
+    return args
 
 def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> tuple:
     eval_data_dir = args.eval_data_dir
@@ -323,8 +335,6 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
     #TODO - add ability to do fewshot sampling for using datasets directly - rather than 
     # loading in separate csv folders
     
-    
-
     def tokenize_function(examples):
         # max_length is important when using prompt tuning  or prefix tuning 
         # or p tuning as virtual tokens are added - which can overshoot the 
@@ -365,8 +375,6 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
         tokenize_function,
         batched=True,
         remove_columns=['text', 'triage-category'])
-
-    tokenized_datasets = tokenized_datasets.rename_column("label", "labels")
 
     return tokenized_datasets, num_labels
 
@@ -565,10 +573,10 @@ def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -
 # setup main function
 def main() -> None:
     args = parse_args()    
+    args = get_dataset_directory_details(args)
 
     # setup params
     data_dir = args.data_dir
-    training_data_dir = args.training_data_dir
     log_save_dir = args.log_save_dir
     ckpt_save_dir = args.ckpt_save_dir
     peft_method = args.peft_method
@@ -600,8 +608,6 @@ def main() -> None:
     loguru_logger.info(f"Logging to: {logging_dir}")
     loguru_logger.info(f"Saving ckpts to: {ckpt_dir}")  
     
-
-        
     if args.saving_strategy != "no":
         if not os.path.exists(ckpt_dir):
             os.makedirs(ckpt_dir)
@@ -624,20 +630,16 @@ def main() -> None:
         if "roberta" in model_name_or_path:
             tokenizer_args["add_prefix_space"] = True
             
-            
     if "llama" in model_name_or_path:
         loguru_logger.info("Using llama tokenizer")
         tokenizer = LlamaTokenizer.from_pretrained(**tokenizer_args)
     else:
         tokenizer = AutoTokenizer.from_pretrained(**tokenizer_args)   
 
-
-
     if getattr(tokenizer, "pad_token_id") is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
         
     if task_type == "SEQ_CLS":
-      
         def collate_fn(examples):
             return tokenizer.pad(examples, padding="longest", return_tensors="pt")
     else:    
@@ -664,6 +666,9 @@ def main() -> None:
         tokenized_datasets["validation"] = data_tuple[1][0]
         num_labels = data_tuple[2]
         all_ner_tags = data_tuple[3]
+
+    if args.label_name != "labels":
+        tokenized_datasets = tokenized_datasets.rename_column(args.label_name, "labels")
 
     print(f'Sample train data:\n{tokenized_datasets["train"][10]}')
     print(f'\nSample train data (decoded):'+
