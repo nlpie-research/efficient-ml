@@ -669,8 +669,6 @@ def main() -> None:
 
     ######################### Model setup #########################
     loguru_logger.info("Setting up model")
-    # set up some PEFT params
-    peft_config, lr = create_peft_config(peft_method, model_name_or_path,task_type)
     
     model_args = dict(pretrained_model_name_or_path=model_name_or_path, 
                           num_labels=num_labels, 
@@ -705,13 +703,23 @@ def main() -> None:
     else:#NOTE maybe we want to do fp16 for all anyway
         fp16_flag = False
     
-    #FIXME - at moment when using custom roberta it ledas to GPU OOM error 
-    # during evaluation loop
     #########uncomment below for PEFT models#########
-    model = get_peft_model(model, peft_config)
-    print(f"peft config is: {peft_config}")
-    # print(model)
-    model.print_trainable_parameters()
+    
+    # if not pethod method supplied - do full-finetuning
+    #TODO  - edit below
+    if peft_method == "Full":
+        loguru_logger.info("Using full finetuning")
+        lr = 3e-5
+        peft_config = None
+    else:
+        # set up some PEFT params
+        peft_config, lr = create_peft_config(peft_method, model_name_or_path,task_type)
+        model = get_peft_model(model, peft_config)
+        print(f"peft config is: {peft_config}")
+        # print(model)
+        model.print_trainable_parameters()
+        
+    # send move to device i.e. cuda
     model.to(device)
     
     
