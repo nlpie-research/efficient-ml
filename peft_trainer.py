@@ -319,6 +319,11 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
     if args.training_size == "fewshot":
         training_data_dir = f"{training_data_dir}/fewshot_{few_shot_n}/"
         loguru_logger.info(f"Training data dir updated to: {training_data_dir}") 
+        
+    #TODO - add ability to do fewshot sampling for using datasets directly - rather than 
+    # loading in separate csv folders
+    
+    
 
     def tokenize_function(examples):
         # max_length is important when using prompt tuning  or prefix tuning 
