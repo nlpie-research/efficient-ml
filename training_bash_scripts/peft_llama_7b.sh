@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# decapoda-research/llama-7b-hf ybelkada/falcon-7b-sharded-bf16
-model_name_or_path=(ybelkada/falcon-7b-sharded-bf16                                                                      
+# decapoda-research/llama-7b-hf ybelkada/falcon-7b-sharded-bf16 tiiuae/falcon-7b-instruct
+model_name_or_path=(ybelkada/falcon-7b-sharded-bf16                                                                 
                      )
 task=icd9-triage-no-category-in-text
-num_sample=(200)
+num_sample=(64)
 peft_methods=(LORA)
 max_epochs=5
 gpu=3
@@ -15,7 +15,7 @@ for model in "${model_name_or_path[@]}"
         do
         for num in "${num_sample[@]}"
             do
-            CUDA_VISIBLE_DEVICES="$gpu" python peft_trainer.py --model_name_or_path "$model" \
+            CUDA_VISIBLE_DEVICES="$gpu" python peft_trainer_v2.py --model_name_or_path "$model" \
                                     --max_epochs "$max_epochs" \
                                     --training_data_dir "$data_dir" \
                                     --eval_data_dir "$eval_data_dir" \

@@ -45,7 +45,7 @@
 
 
 # Sample config for a Token Classification task
-model_name_or_path=(roberta-base)
+model_name_or_path=(nlpie/distil-biobert)
 peft_methods=(LORA)
 task=i2b2-2012-NER
 max_epochs=5

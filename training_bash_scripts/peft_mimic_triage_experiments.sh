@@ -7,7 +7,9 @@
 #                     /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/                                                           
 #                      )
 model_name_or_path=(/mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/
-                    nlpie/distil-biobert 
+                    nlpie/distil-biobert
+                    nlpie/tiny-biobert
+                    nlpie/bio-mobilebert 
                     /mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/                                                                                                 
                      )
 task=icd9-triage-no-category-in-text
