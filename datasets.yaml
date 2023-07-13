@@ -1,0 +1,99 @@
+mednli:
+    training_data_dir: ''
+    eval_data_dir: ''
+    data_dir: /mnt/sdd/efficient_ml_data/datasets/MedNLI
+    training_file: ''
+    validation_file: ''
+    test_file: ''
+    task_type: SEQ_CLS
+    label_name: ''
+mimic-dia:
+    training_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/dia
+    eval_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/dia
+    data_dir: ''
+    training_file: DIA_GROUPS_3_DIGITS_adm_train.csv
+    validation_file: DIA_GROUPS_3_DIGITS_adm_val.csv
+    test_file: DIA_GROUPS_3_DIGITS_adm_test.csv
+    task_type: SEQ_CLS
+    label_name: ''
+mimic-dia-adm-only:
+    training_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/dia_adm_only
+    eval_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/dia_adm_only
+    data_dir: ''
+    training_file: DIA_GROUPS_3_DIGITS_adm_train.csv
+    validation_file: DIA_GROUPS_3_DIGITS_adm_val.csv
+    test_file: DIA_GROUPS_3_DIGITS_adm_test.csv
+    task_type: SEQ_CLS
+    label_name: ''
+mimic-los:
+    training_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/los
+    eval_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/los
+    data_dir: ''
+    training_file: LOS_WEEKS_adm_train.csv
+    validation_file: LOS_WEEKS_adm_val.csv
+    test_file: LOS_WEEKS_adm_test.csv
+    task_type: SEQ_CLS
+    label_name: ''
+mimic-los-adm-only:
+    training_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/los_adm_only
+    eval_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/los_adm_only
+    data_dir: ''
+    training_file: LOS_WEEKS_adm_train.csv
+    validation_file: LOS_WEEKS_adm_val.csv
+    test_file: LOS_WEEKS_adm_test.csv
+    task_type: SEQ_CLS
+    label_name: ''
+mimic-dia-mp:
+    training_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/mp
+    eval_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/mp
+    data_dir: ''
+    training_file: train.csv
+    validation_file: valid.csv
+    test_file: test.csv
+    task_type: SEQ_CLS
+    label_name: ''
+icd9-triage-no-category-in-text:
+    training_data_dir: /mnt/sdd/efficient_ml_data/datasets/icd9-triage/no_category_in_text
+    eval_data_dir: /mnt/sdd/efficient_ml_data/datasets/icd9-triage/no_category_in_text
+    data_dir: ''
+    training_file: train.csv
+    validation_file: valid.csv
+    test_file: test.csv
+    task_type: SEQ_CLS
+    label_name: label
+i2b2-2010-NER:
+    training_data_dir: ''
+    eval_data_dir: ''
+    data_dir: /mnt/sdd/efficient_ml_data/datasets/I2B22010NER_hf_dataset
+    training_file: ''
+    validation_file: ''
+    test_file: ''
+    task_type: TOKEN_CLS
+    label_name: ''
+i2b2-2012-NER:
+    training_data_dir: ''
+    eval_data_dir: ''
+    data_dir: /mnt/sdd/efficient_ml_data/datasets/i2b2-2012_hf_dataset
+    training_file: ''
+    validation_file: ''
+    test_file: ''
+    task_type: TOKEN_CLS
+    label_name: labels
+i2b2-2014-NER:
+    training_data_dir: ''
+    eval_data_dir: ''
+    data_dir: /mnt/sdd/efficient_ml_data/datasets/i2b2-2014_hf_dataset
+    training_file: ''
+    validation_file: ''
+    test_file: ''
+    task_type: TOKEN_CLS
+    label_name: ''
+i2b2-2010-RE:
+    training_data_dir: ''
+    eval_data_dir: ''
+    data_dir: /mnt/sdd/efficient_ml_data/datasets/i2b2-2010-RE
+    training_file: ''
+    validation_file: ''
+    test_file: ''
+    task_type: SEQ_CLS
+    label_name: 
