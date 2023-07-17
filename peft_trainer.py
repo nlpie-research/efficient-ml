@@ -1,4 +1,3 @@
-import argparse
 import os
 from functools import partial
 
@@ -15,7 +14,7 @@ import evaluate
 import numpy as np
 import torch
 import yaml
-from datasets import load_dataset, load_from_disk
+from datasets import load_dataset, load_from_disk, concatenate_datasets, DatasetDict
 from loguru import logger as loguru_logger
 from peft import (LoraConfig, PeftType, PrefixTuningConfig,
                   PromptEncoderConfig, PromptTuningConfig, TaskType,
@@ -98,7 +97,7 @@ def parse_args() -> argparse.Namespace:
                         type=str,
                         help = "The data path containing the dataset to use")
     parser.add_argument("--cache_dir",
-                        default = "/mnt/sdc/niallt/.cache/",
+                        default = None,
                         type=str,
                         help = "The data path to the directory containing the notes and referral data files")
     parser.add_argument("--training_file",
@@ -184,7 +183,7 @@ def parse_args() -> argparse.Namespace:
                         type=str,
                         help="Whether to log every n steps or per epoch")
     parser.add_argument("--saving_strategy",
-                        default="steps", # steps or epoch or no
+                        default="no", # steps or epoch or no
                         type=str,
                         help="Whether to save checkpoints and if so how often")      
     parser.add_argument("--label_col",
@@ -222,10 +221,7 @@ def parse_args() -> argparse.Namespace:
                         default="adamw",
                         type=str,
                         help="Optimization algorithm to use e.g. adamw, adafactor")
-    parser.add_argument("--training_size",
-                        default="full",
-                        type=str,
-                        help="full training used, fewshot, or zero")   
+
     parser.add_argument("--peft_method",
                         default="LORA", # LORA, PREFIX_TUNING, PROMPT_TUNING, P_TUNING
                         type=str,
@@ -264,6 +260,7 @@ def parse_args() -> argparse.Namespace:
                                 "mimic-note-category": ("TEXT", None),
                                 "icd9-triage":("text", None),
                                 "icd9-triage-no-category-in-text":("text", None),
+                                "mimic-los": ("text", None)
                                 },
                         type = dict,
                         help = "mapping of task name to tuple of the note formats")
@@ -275,6 +272,17 @@ def parse_args() -> argparse.Namespace:
 
     args = parser.parse_args()
     return args
+
+def get_dataset_columns(key:str, task_to_keys:dict) -> tuple[str,str]:
+    """
+    Get tuple for key. 
+    If key is not found, return default tuple.
+    """
+    
+    if key in task_to_keys:
+        return task_to_keys[key]
+    else:
+        return ('text', None)
 
 def get_model_name(model_name_or_path:str) -> str:
     if "saved_models" in model_name_or_path:
@@ -326,11 +334,9 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
     task = args.task
     model_name_or_path = args.model_name_or_path
     few_shot_n = args.few_shot_n
+    remove_coumns = args.remove_columns
     
-    # update training data dir based on few shot
-    if args.training_size == "fewshot":
-        training_data_dir = f"{training_data_dir}/fewshot_{few_shot_n}/"
-        loguru_logger.info(f"Training data dir updated to: {training_data_dir}") 
+
         
     #TODO - add ability to do fewshot sampling for using datasets directly - rather than 
     # loading in separate csv folders
@@ -361,20 +367,21 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
     loguru_logger.info(f"Data loaded. Dataset info: {datasets}")
     
     # get number of labels
-    num_labels = len(np.unique(datasets["train"]["label"]))
+    num_labels = len(np.unique(datasets["train"][args.label_name]))
     loguru_logger.info(f"Number of labels is: {num_labels}")
     
     print(f"tokenizer is: {tokenizer}")
 
     # set up data keys
-    sentence1_key, sentence2_key = task_to_keys[task]
+    sentence1_key, sentence2_key = get_dataset_columns(task, task_to_keys)
     # tokenize function
     
     # # apply to dataset
+    #FIXME - this is only valid for triage task - need to make more general
     tokenized_datasets = datasets.map(
         tokenize_function,
         batched=True,
-        remove_columns=['text', 'triage-category'])
+        remove_columns=args.remove_columns)
 
     return tokenized_datasets, num_labels
 
@@ -488,15 +495,29 @@ def compute_seq_cls_metrics(eval_pred):
     recall_score = evaluate.load("recall")
     accuracy_score = evaluate.load("accuracy")
     f1_score = evaluate.load("f1")        
-    roc_auc_score = evaluate.load("roc_auc", "multiclass")        
+          
 
-    logits, labels = eval_pred
-    
-    # print(f"logits are: {logits} of shape: {logits.shape}")
-    #TODO add softmax to convert logits to probs
+    logits, labels = eval_pred    
     # print(f"logits shape is: {logits.shape}")
     pred_scores = softmax(logits, axis = -1)        
     predictions = np.argmax(logits, axis = -1)
+    
+    # roc_auc_score needs to handle both binary and multiclass
+    # check shape of logits to determine which to use
+    if logits.shape[1] == 1 or logits.shape[1] == 2:
+        roc_auc_score = evaluate.load("roc_auc", "binary")
+        roc_auc = roc_auc_score.compute(references=labels,
+                                        # just take the probabilties of the positive class
+                                        prediction_scores = pred_scores[:,1]                                         
+                                        )['roc_auc']
+    else:
+        roc_auc_score = evaluate.load("roc_auc", "multiclass")
+
+        roc_auc = roc_auc_score.compute(references=labels,
+                                        prediction_scores = pred_scores,
+                                        multi_class = 'ovr', 
+                                        average = "macro")['roc_auc']  
+    # print(f"logits are: {logits} of shape: {logits.shape}")
     
     # print(f"Labels are: {labels}\n")
     # print(f"Preds are: {predictions}")
@@ -505,11 +526,7 @@ def compute_seq_cls_metrics(eval_pred):
     accuracy = accuracy_score.compute(predictions=predictions, references=labels)["accuracy"]
     f1_macro = f1_score.compute(predictions=predictions, references=labels, average = "macro")["f1"]
     f1_weighted = f1_score.compute(predictions=predictions, references=labels, average = "weighted")["f1"]
-    # roc_auc has slightly different format - needs the probs/scores rather than predicted labels
-    roc_auc = roc_auc_score.compute(references=labels,
-                                    prediction_scores = pred_scores,
-                                    multi_class = 'ovr', 
-                                    average = "macro")['roc_auc']
+
     
     return {"precision": precision, 
             "recall": recall,
@@ -598,7 +615,7 @@ def main() -> None:
     model_name = get_model_name(model_name_or_path)
     
     # set up logging and ckpt dirs
-    if args.training_size == "fewshot":
+    if few_shot_n is not None:
         logging_dir = f"{log_save_dir}/{task}/fewshot_{few_shot_n}/{model_name}/{peft_method}/{time_now}/"
         ckpt_dir = f"{ckpt_save_dir}/{task}/fewshot_{few_shot_n}/{model_name}/{peft_method}/{time_now}/"
     else:
@@ -661,14 +678,31 @@ def main() -> None:
                     batch_size=[train_batch_size],
                     runs=1)
         data_tuple = load_datasets(info=ds_info, tokenizer=tokenizer)
-        tokenized_datasets = {}
+        tokenized_datasets = DatasetDict()
         tokenized_datasets["train"] = data_tuple[0]
         tokenized_datasets["validation"] = data_tuple[1][0]
         num_labels = data_tuple[2]
         all_ner_tags = data_tuple[3]
-
-    if args.label_name != "labels":
+    
+    if "labels" not in tokenized_datasets["train"].features:
         tokenized_datasets = tokenized_datasets.rename_column(args.label_name, "labels")
+        
+    # if we are doing few shot - we need to sample the training data
+    if few_shot_n is not None:
+        train_datasets = []
+        for label in range(num_labels):
+            label_dataset = tokenized_datasets['train'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
+            num_samples = len(label_dataset)
+            # if we have more samples than the few shot n - then we need to sample
+            if num_samples >= few_shot_n:
+
+                # select num_samples_per_class samples from the label
+                label_dataset = label_dataset.select(range(few_shot_n))
+            
+            # add to list of datasets
+            train_datasets.append(label_dataset)
+
+        tokenized_datasets["train"] = concatenate_datasets(train_datasets)
 
     print(f'Sample train data:\n{tokenized_datasets["train"][10]}')
     print(f'\nSample train data (decoded):'+
