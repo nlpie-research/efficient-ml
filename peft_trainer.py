@@ -1,7 +1,9 @@
 import os
 from functools import partial
+# print cuda_visible_devices 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0" 
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 # 6,7
 # 2080s = 0,3,5,6,8 
 # When specifiying from the command line, Nvidia-smi ids: 0, 3, 5, 6, 8 Actual id: 5,6,7,8,9 
@@ -560,6 +562,13 @@ def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -
                 ]
             )
             lr = 3e-4
+        if "mobile" in model_name_or_path:
+            loguru_logger.info("Using mobile config")
+            peft_type = PeftType.LORA
+            lr = 3e-4
+            peft_config = LoraConfig(task_type=task_type, target_modules=["query", "key", "value"], inference_mode=False, 
+                                    r=8, lora_alpha=16, lora_dropout=0.1)
+            
         else:
             peft_type = PeftType.LORA
             lr = 3e-4
