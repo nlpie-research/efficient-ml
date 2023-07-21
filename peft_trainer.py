@@ -33,6 +33,7 @@ from transformers import (AutoModelForSequenceClassification,
                           LlamaForSequenceClassification, LlamaTokenizer,
                           Trainer, TrainingArguments,
                           get_linear_schedule_with_warmup, set_seed)
+from data_utils.model_utils import count_parameters
 
 '''
 Script to train a prefix-tuning model on a given dataset. 
@@ -623,6 +624,9 @@ def main() -> None:
     # forward slashes really matter for the naming convention make sure to append the path with a forward slash
     model_name = get_model_name(model_name_or_path)
     
+    # save to the args
+    args.custom_model_name = model_name
+    
     # set up logging and ckpt dirs
     if few_shot_n is not None:
         logging_dir = f"{log_save_dir}/{task}/fewshot_{few_shot_n}/{model_name}/{peft_method}/{time_now}/"
@@ -772,6 +776,10 @@ def main() -> None:
         # print(model)
         model.print_trainable_parameters()
         
+        # lets also confirm this directly and save to args
+        args.n_trainable_params = count_parameters(model)
+        
+        
     # send move to device i.e. cuda
     model.to(device)
     
@@ -825,6 +833,7 @@ def main() -> None:
         # label_names = ["labels"],#FIXME - this is a hack to get around the fact that the peft model changes the output format and this causes issues with the trainer
     )
     
+   
     # setup normal trainer
     trainer = Trainer(
         model,
@@ -841,6 +850,7 @@ def main() -> None:
     
     # run evaluation on test set
     trainer.evaluate()
+
     # save the args/params to a text/yaml file
     with open(f'{logging_dir}/config.txt', 'w') as f:
         json.dump(args.__dict__, f, indent=2)
