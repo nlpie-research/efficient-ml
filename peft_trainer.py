@@ -58,7 +58,7 @@ class DatasetInfo:
                metric=None, 
                load_from_disk=True,
                isMultiSentence=False, 
-               validationSubsets=["test"],
+               validationSubsets=["validation","test"],
                lr=[5e-5, 2e-5, 1e-5], 
                batch_size=[32], 
                epochs=3, 
@@ -263,7 +263,8 @@ def parse_args() -> argparse.Namespace:
                                 "mimic-note-category": ("TEXT", None),
                                 "icd9-triage":("text", None),
                                 "icd9-triage-no-category-in-text":("text", None),
-                                "mimic-los": ("text", None)
+                                "mimic-los": ("text", None),
+                                "mednli": ("sentence1", "sentence2"),
                                 },
                         type = dict,
                         help = "mapping of task name to tuple of the note formats")
@@ -395,6 +396,8 @@ def load_datasets(info:DatasetInfo, tokenizer:AutoTokenizer) -> tuple:
       dataset = load_dataset(info.name)
     else:
       dataset = load_from_disk(info.name)
+      
+    loguru_logger.info(f"Dataset loaded. Dataset info: {dataset}")
 
     if info.type == "classification":
       num_labels = len(set(dataset["train"]["labels"]))
@@ -456,17 +459,27 @@ def load_datasets(info:DatasetInfo, tokenizer:AutoTokenizer) -> tuple:
     tokenizedValDatasets = []
 
     for name in info.validationSubsets:
-      tokenizedValDataset = dataset[name].map(mappingFunction,
-                                              batched=True,
-                                              remove_columns=dataset[name].column_names,
-                                              fn_kwargs={"padding": "do_not_pad"})
-      
-      tokenizedValDatasets.append(tokenizedValDataset)
+        
+        
+        # Check if subset name exists in dataset
+        if name not in dataset:
+            loguru_logger.warning(f"Warning: Subset {name} not found in dataset")
+            continue 
+        
+        tokenizedValDataset = dataset[name].map(mappingFunction,
+                                                batched=True,
+                                                remove_columns=dataset[name].column_names,
+                                                fn_kwargs={"padding": "do_not_pad"})
+        
+        tokenizedValDatasets.append(tokenizedValDataset)
 
     if info.num_labels != None:
       num_labels = info.num_labels
 
-    return tokenizedTrainDataset, tokenizedValDatasets, num_labels, dataset["info"][0]["all_ner_tags"]
+    if info.type == "ner":
+        return tokenizedTrainDataset, tokenizedValDatasets, num_labels, dataset["info"][0]["all_ner_tags"]
+    else:
+        return tokenizedTrainDataset, tokenizedValDatasets, num_labels
 
 def compute_token_cls_metrics(eval_pred, label_list, metric):
     predictions, labels = eval_pred
@@ -522,12 +535,13 @@ def compute_seq_cls_metrics(eval_pred):
                                         average = "macro")['roc_auc']  
     # print(f"logits are: {logits} of shape: {logits.shape}")
     
-    # print(f"Labels are: {labels}\n")
-    # print(f"Preds are: {predictions}")
+    print(f"Labels are: {labels}\n")
+    print(f"Preds are: {predictions}")
     precision = precision_score.compute(predictions=predictions, references=labels, average = "macro")["precision"]
     recall = recall_score.compute(predictions=predictions, references=labels, average = "macro")["recall"]
     accuracy = accuracy_score.compute(predictions=predictions, references=labels)["accuracy"]
     f1_macro = f1_score.compute(predictions=predictions, references=labels, average = "macro")["f1"]
+    f1_micro = f1_score.compute(predictions=predictions, references=labels, average = "micro")["f1"]
     f1_weighted = f1_score.compute(predictions=predictions, references=labels, average = "weighted")["f1"]
 
     
@@ -535,6 +549,7 @@ def compute_seq_cls_metrics(eval_pred):
             "recall": recall,
             "accuracy": accuracy,
             "f1_macro":f1_macro,
+            "f1_micro":f1_micro,
             "f1_weighted":f1_weighted,
             "roc_auc_macro":roc_auc}
 
@@ -682,26 +697,38 @@ def main() -> None:
     else:
         if task_type == "SEQ_CLS":
             ds_type = "classification"
+            ds_info = DatasetInfo(name=data_dir, 
+            metric="f1", load_from_disk=True,
+            ds_type=ds_type, isMultiSentence=False,
+            lr=[5e-5, 2e-5, 1e-5], epochs=3,
+            batch_size=[train_batch_size],
+            runs=1)        
+            data_tuple = load_datasets(info=ds_info, tokenizer=tokenizer)
+            tokenized_datasets = DatasetDict()
+            tokenized_datasets["train"] = data_tuple[0]
+            tokenized_datasets["validation"] = data_tuple[1][0]
+            num_labels = data_tuple[2]
         else:
-            ds_type = "ner"
-        ds_info = DatasetInfo(name=data_dir, 
-                    metric="f1", load_from_disk=True,
-                    ds_type=ds_type, isMultiSentence=False,
-                    lr=[5e-5, 2e-5, 1e-5], epochs=3,
-                    batch_size=[train_batch_size],
-                    runs=1)
-        data_tuple = load_datasets(info=ds_info, tokenizer=tokenizer)
-        tokenized_datasets = DatasetDict()
-        tokenized_datasets["train"] = data_tuple[0]
-        tokenized_datasets["validation"] = data_tuple[1][0]
-        num_labels = data_tuple[2]
-        all_ner_tags = data_tuple[3]
+            ds_type = "ner"        
+            ds_info = DatasetInfo(name=data_dir, 
+                        metric="f1", load_from_disk=True,
+                        ds_type=ds_type, isMultiSentence=False,
+                        lr=[5e-5, 2e-5, 1e-5], epochs=3,
+                        batch_size=[train_batch_size],
+                        runs=1)        
+            data_tuple = load_datasets(info=ds_info, tokenizer=tokenizer)
+            tokenized_datasets = DatasetDict()
+            tokenized_datasets["train"] = data_tuple[0]
+            tokenized_datasets["validation"] = data_tuple[1][0]
+            num_labels = data_tuple[2]
+            all_ner_tags = data_tuple[3]
     
     if "labels" not in tokenized_datasets["train"].features:
         tokenized_datasets = tokenized_datasets.rename_column(args.label_name, "labels")
         
     # if we are doing few shot - we need to sample the training data
     if few_shot_n is not None:
+        loguru_logger.info(f"Sampling {few_shot_n} samples per class")
         train_datasets = []
         for label in range(num_labels):
             label_dataset = tokenized_datasets['train'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
@@ -721,8 +748,9 @@ def main() -> None:
     print(f'\nSample train data (decoded):'+
             f'{tokenizer.decode(tokenized_datasets["train"][10]["input_ids"])}')        
     # print length of datasets
-    print(f"tokenized datasets:\n {tokenized_datasets['validation']}")
-    print(f"tokenized datasets:\n {tokenized_datasets['train']}")
+    print(f"Final tokenized train dataset:\n {tokenized_datasets['train']}")
+    print(f"tokenized evaluation datasets:\n {tokenized_datasets['validation']}")
+    
 
     ######################### Model setup #########################
     loguru_logger.info("Setting up model")
