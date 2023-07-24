@@ -7,8 +7,8 @@ mednli:
   test_file: ''
   task_type: SEQ_CLS
   label_name: ''
-  text_column: text
-  remove_columns: [text]
+  text_column: [sentence1 sentence2]
+  remove_columns: [sentence1 sentence2]
 
 mimic-dia:
   training_data_dir: /mnt/sdd/efficient_ml_data/datasets/mimic3-clinical-outcomes/dia
