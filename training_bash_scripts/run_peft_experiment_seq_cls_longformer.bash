@@ -9,14 +9,9 @@
 # /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/                                                                                                 
 #                      )
 # peft_methods=(Full) # LORA PREFIX_TUNING PROMPT_TUNING P_TUNING
-model_name_or_path=(nlpie/bio-mobilebert
-                    nlpie/tiny-biobert
-                    roberta-base
-                    nlpie/distil-biobert
-                    emilyalsentzer/Bio_ClinicalBERT
-                    /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/)
-peft_methods=(PROMPT_TUNING LORA)
-tasks=(i2b2-2010-RE)
+model_name_or_path=(yikuan8/Clinical-Longformer)
+peft_methods=(LORA)
+tasks=(icd9-triage)
 max_epochs=5
 gpu=1
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/logs
@@ -34,7 +29,10 @@ for task in "${tasks[@]}"
                 --task "$task" \
                 --peft_method "$peft_method" \
                 --log_save_dir $log_save_dir \
-                --ckpt_save_dir $ckpt_save_dir
+                --ckpt_save_dir $ckpt_save_dir \
+                --train_batch_size 2 \
+                --eval_batch_size 2 \
+                --max_length 4096
         done
     done
 done

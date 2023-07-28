@@ -33,7 +33,7 @@ from transformers import (AutoModelForSequenceClassification,
                           LlamaForSequenceClassification, LlamaTokenizer,
                           Trainer, TrainingArguments,
                           get_linear_schedule_with_warmup, set_seed)
-from data_utils.model_utils import count_parameters
+from data_utils.model_utils import count_trainable_parameters
 
 '''
 Script to train a prefix-tuning model on a given dataset. 
@@ -389,7 +389,7 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
 
     return tokenized_datasets, num_labels
 
-def load_datasets(info:DatasetInfo, tokenizer:AutoTokenizer) -> tuple:
+def load_datasets(args:argparse.Namespace, info:DatasetInfo, tokenizer:AutoTokenizer) -> tuple:
     """#Dataset Utilities"""
     
     if not info.load_from_disk:
@@ -405,13 +405,13 @@ def load_datasets(info:DatasetInfo, tokenizer:AutoTokenizer) -> tuple:
         if info.isMultiSentence:
           outputs = tokenizer(samples[dataset["train"].column_names[0]],
                               samples[dataset["train"].column_names[1]],
-                              max_length=512,
+                              max_length=args.max_length,
                               truncation=True,
                               padding=kargs["padding"])
         else:
           outputs = tokenizer(samples[dataset["train"].column_names[0]],
                               truncation=True,
-                              max_length=512,
+                              max_length=args.max_length,
                               padding=kargs["padding"])
 
         outputs["labels"] = samples["labels"]
@@ -424,7 +424,7 @@ def load_datasets(info:DatasetInfo, tokenizer:AutoTokenizer) -> tuple:
         tokenized_samples = tokenizer.batch_encode_plus(all_samples_per_split["tokens"],
                                                         is_split_into_words=True, 
                                                         truncation=True,
-                                                        max_length=512,
+                                                        max_length=args.max_length,
                                                         padding=kargs["padding"])  
         total_adjusted_labels = []
 
@@ -518,6 +518,11 @@ def compute_seq_cls_metrics(eval_pred):
     pred_scores = softmax(logits, axis = -1)        
     predictions = np.argmax(logits, axis = -1)
     
+    # print(f"logits are: {logits} of shape: {logits.shape}")
+    # print(f"Labels are: {labels}\n")
+    # print(f"Preds are: {predictions}")
+    # print(f"Pred scores are: {pred_scores}")
+    
     # roc_auc_score needs to handle both binary and multiclass
     # check shape of logits to determine which to use
     if logits.shape[1] == 1 or logits.shape[1] == 2:
@@ -554,10 +559,13 @@ def compute_seq_cls_metrics(eval_pred):
             "roc_auc_macro":roc_auc}
 
 def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -> tuple:
+    
+    #TODO - add the target_modules to a config file
     if peft_method == "LORA":
         loguru_logger.info("Using LORA")
-        # according to authors for falcon model adding all linear layers is important     
-        if "falcon" in model_name_or_path:
+        # according to authors for falcon model adding all linear layers is important
+        # in fact, add lora_alpha etc to config too. This is a bit of a mess     
+        if "falcon" in model_name_or_path.lower():
             loguru_logger.info("Using falcon config")
             lora_alpha = 16
             lora_dropout = 0.1
@@ -578,18 +586,29 @@ def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -
                 ]
             )
             lr = 3e-4
-        if "mobile" in model_name_or_path:
+        elif "mobile" in model_name_or_path.lower():
             loguru_logger.info("Using mobile config")
             peft_type = PeftType.LORA
             lr = 3e-4
             peft_config = LoraConfig(task_type=task_type, target_modules=["query", "key", "value"], inference_mode=False, 
                                     r=8, lora_alpha=16, lora_dropout=0.1)
             
+        elif "longformer" in model_name_or_path.lower():
+            loguru_logger.info("Using longformer config")
+            peft_type = PeftType.LORA
+            lr = 3e-4
+            peft_config = LoraConfig(task_type="SEQ_CLS", target_modules=["query","value","key", 
+                                                         "query_global", 
+                                                         "value_global",
+                                                         "key_global"] ,inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1)
+            
+            
         else:
             peft_type = PeftType.LORA
             lr = 3e-4
             peft_config = LoraConfig(task_type=task_type, inference_mode=False, 
                                     r=8, lora_alpha=16, lora_dropout=0.1)
+            
     elif peft_method == "PREFIX_TUNING":
         loguru_logger.info("Using PREFIX_TUNING")
         peft_type = PeftType.PREFIX_TUNING
@@ -598,9 +617,17 @@ def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -
         lr = 1e-2
     elif peft_method == "PROMPT_TUNING":
         loguru_logger.info("Using PROMPT_TUNING")
-        peft_type = PeftType.PROMPT_TUNING
-        peft_config = PromptTuningConfig(task_type=task_type, 
-                                         num_virtual_tokens=10)
+        # i think we need to set the embedding dimension explicitly for prompt tuning for mobile bert
+        if "mobile" in model_name_or_path:
+            peft_type = PeftType.PROMPT_TUNING
+            peft_config = PromptTuningConfig(task_type=task_type,
+                                             token_dim = 128,
+                                            num_virtual_tokens=10)
+        else:
+            peft_type = PeftType.PROMPT_TUNING
+            peft_config = PromptTuningConfig(task_type=task_type, 
+                                            num_virtual_tokens=10)
+
         lr = 1e-3
     elif peft_method == "P_TUNING":
         loguru_logger.info("Using P_TUNING")
@@ -703,7 +730,7 @@ def main() -> None:
             lr=[5e-5, 2e-5, 1e-5], epochs=3,
             batch_size=[train_batch_size],
             runs=1)        
-            data_tuple = load_datasets(info=ds_info, tokenizer=tokenizer)
+            data_tuple = load_datasets(args = args, info=ds_info, tokenizer=tokenizer)
             tokenized_datasets = DatasetDict()
             tokenized_datasets["train"] = data_tuple[0]
             tokenized_datasets["validation"] = data_tuple[1][0]
@@ -716,7 +743,7 @@ def main() -> None:
                         lr=[5e-5, 2e-5, 1e-5], epochs=3,
                         batch_size=[train_batch_size],
                         runs=1)        
-            data_tuple = load_datasets(info=ds_info, tokenizer=tokenizer)
+            data_tuple = load_datasets(args=args, info=ds_info, tokenizer=tokenizer)
             tokenized_datasets = DatasetDict()
             tokenized_datasets["train"] = data_tuple[0]
             tokenized_datasets["validation"] = data_tuple[1][0]
@@ -805,7 +832,7 @@ def main() -> None:
         model.print_trainable_parameters()
         
         # lets also confirm this directly and save to args
-        args.n_trainable_params = count_parameters(model)
+        args.n_trainable_params = count_trainable_parameters(model)
         
         
     # send move to device i.e. cuda
@@ -876,8 +903,7 @@ def main() -> None:
     # run training
     trainer.train()
     
-    # run evaluation on test set
-    trainer.evaluate()
+
 
     # save the args/params to a text/yaml file
     with open(f'{logging_dir}/config.txt', 'w') as f:
@@ -889,8 +915,12 @@ def main() -> None:
     with open(f'{logging_dir}/all_trainer_args.yaml', 'w') as f:
         yaml.dump(trainer.args.__dict__, f)   
         
+       
     # save the peft weights to a file
     model.save_pretrained(f"{ckpt_dir}")
+    
+    # run evaluation on test set
+    trainer.evaluate()
 
 # run script
 if __name__ == "__main__":
