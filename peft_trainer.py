@@ -15,6 +15,7 @@ from datetime import datetime
 import evaluate
 import numpy as np
 import torch
+from torchmetrics import AUROC
 import yaml
 from datasets import load_dataset, load_from_disk, concatenate_datasets, DatasetDict
 from loguru import logger as loguru_logger
@@ -519,25 +520,52 @@ def compute_seq_cls_metrics(eval_pred):
     predictions = np.argmax(logits, axis = -1)
     
     # print(f"logits are: {logits} of shape: {logits.shape}")
+    # check if pred_scores sum to 1
+            
     # print(f"Labels are: {labels}\n")
     # print(f"Preds are: {predictions}")
     # print(f"Pred scores are: {pred_scores}")
     
     # roc_auc_score needs to handle both binary and multiclass
     # check shape of logits to determine which to use
-    if logits.shape[1] == 1 or logits.shape[1] == 2:
-        roc_auc_score = evaluate.load("roc_auc", "binary")
-        roc_auc = roc_auc_score.compute(references=labels,
-                                        # just take the probabilties of the positive class
-                                        prediction_scores = pred_scores[:,1]                                         
-                                        )['roc_auc']
-    else:
-        roc_auc_score = evaluate.load("roc_auc", "multiclass")
+    
+    # compute roc_auc using torchmetrics
 
-        roc_auc = roc_auc_score.compute(references=labels,
-                                        prediction_scores = pred_scores,
-                                        multi_class = 'ovr', 
-                                        average = "macro")['roc_auc']  
+    
+    if logits.shape[1] == 1 or logits.shape[1] == 2:
+        auroc = AUROC(task = "binary")
+        roc_auc = auroc(torch.tensor((pred_scores[:,1])), torch.tensor(labels))
+    else:
+        auroc = AUROC(task = "multiclass", num_classes = logits.shape[1])
+        roc_auc = auroc(torch.tensor((pred_scores)), torch.tensor(labels))
+        
+    
+    # try:
+    #     if logits.shape[1] == 1 or logits.shape[1] == 2:
+    #         roc_auc_score = evaluate.load("roc_auc", "binary")
+    #         roc_auc = roc_auc_score.compute(references=labels,
+    #                                         # just take the probabilties of the positive class
+    #                                         prediction_scores = pred_scores[:,1]                                         
+    #                                         )['roc_auc']
+    #     else:
+    #         roc_auc_score = evaluate.load("roc_auc", "multiclass")
+
+    #         roc_auc = roc_auc_score.compute(references=labels,
+    #                                         prediction_scores = pred_scores,
+    #                                         multi_class = 'ovr', 
+    #                                         average = "macro")['roc_auc']
+    # except:
+    #     with open("./faulty_logits.txt", "w") as f:
+    #         f.write("\n".join([str(l) for l in logits]))
+        
+    #     # same for scores
+    #     with open("./faulty_scores.txt", "w") as f:
+    #         f.write("\n".join([str(l) for l in pred_scores]))
+        
+    #     # exit here
+    #     exit(0)
+            
+        
     # print(f"logits are: {logits} of shape: {logits.shape}")
     
     print(f"Labels are: {labels}\n")
