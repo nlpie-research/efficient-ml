@@ -70,7 +70,7 @@ mimic-mp:
   text_column: text
   remove_columns: [text]
 
-icd9-triage:
+ICD9-Triage:
   training_data_dir: /mnt/sdd/efficient_ml_data/datasets/icd9-triage/no_category_in_text
   eval_data_dir: /mnt/sdd/efficient_ml_data/datasets/icd9-triage/no_category_in_text
   data_dir: ''
