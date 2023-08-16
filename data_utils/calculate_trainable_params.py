@@ -1,0 +1,106 @@
+from peft import (LoraConfig, PeftType, PrefixTuningConfig,
+                  PromptEncoderConfig, PromptTuningConfig, TaskType,
+                  get_peft_config, get_peft_model, get_peft_model_state_dict,
+                  prepare_model_for_int8_training,
+                  prepare_model_for_kbit_training, set_peft_model_state_dict)
+from scipy.special import softmax
+from torch.optim import AdamW
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from transformers import (AutoModelForSequenceClassification,
+                          AutoModelForTokenClassification, AutoTokenizer,
+                          DataCollatorForTokenClassification,
+                          LlamaForSequenceClassification, LlamaTokenizer,
+                          Trainer, TrainingArguments,
+                          get_linear_schedule_with_warmup, set_seed)
+from model_utils import count_trainable_parameters
+import pandas as pd
+from tqdm import tqdm
+# import sys and append path
+import sys
+sys.path.append("../")
+from peft_trainer import create_peft_config
+import yaml
+
+
+def get_number_of_trainable_params(model_type_mappings:dict,
+                                   peft_types:list,
+                                   task_type:str = "SEQ_CLS",
+                                   num_labels:int = 2):
+
+    # set up empty dicts to full for dfs
+    model_peft_dict = {}
+    
+    for model_type in model_type_mappings.keys():
+        
+        model_dict = {}
+        model_name_or_path = model_type_mappings[model_type]
+        model_args = dict(pretrained_model_name_or_path=model_name_or_path, 
+                          num_labels=num_labels, 
+                          output_hidden_states=False, 
+                          trust_remote_code=True)
+
+            
+        if task_type == "SEQ_CLS":
+            model = AutoModelForSequenceClassification.from_pretrained(**model_args)
+        elif task_type == "TOKEN_CLS":
+            model = AutoModelForTokenClassification.from_pretrained(**model_args)
+        
+        # falcon model seems to use model config to define pad token and the remote code panicks if you don't set it
+        if "falcon" in model_name_or_path:
+            model.config.use_cache = False            
+
+        # count total trainable params before peft
+        total_trainable_params = count_trainable_parameters(model)
+        
+        for peft_method in tqdm(peft_types, desc=f"model type: {model_type}"):
+            
+            
+            # set up some PEFT params
+            peft_config, lr = create_peft_config(peft_method, model_name_or_path,task_type)
+            model = get_peft_model(model, peft_config)
+            print(f"peft config is: {peft_config}")
+            # print(model)
+            model.print_trainable_parameters()
+            
+            # lets also confirm this directly and save to args
+            n_trainable_params = count_trainable_parameters(model)
+            # proportion of total trainable params
+            n_trainable_params_perc = (n_trainable_params / total_trainable_params) * 100
+            
+            # store the model name, peft method and number of trainable params
+            model_dict[peft_method] = {"n_trainable_params": n_trainable_params,
+                                 "total_trainable_params": total_trainable_params,
+                                 "n_trainable_params_perc": n_trainable_params_perc}
+            
+        model_peft_dict[model_type] = model_dict
+
+    return model_peft_dict
+
+    
+   
+            
+# now save to yaml
+if __name__ == "__main__":
+    
+    
+
+    model_type_mappings = {
+                "roberta-base": "roberta-base",
+                "bert": "bert-base-uncased",
+                "mobile-biobert": "nlpie/bio-mobilebert",
+                "distil-biobert": "nlpie/distil-biobert",
+                "tiny-biobert": "nlpie/tiny-biobert",
+                "llama-7b": "meta-llama/Llama-2-7b-hf",
+                }
+
+    peft_types = ["PROMPT_TUNING","LORA", "PREFIX_TUNING", "P_TUNING"]
+
+    
+    trainable_params_dict = get_number_of_trainable_params(model_type_mappings, peft_types, task_type="SEQ_CLS", num_labels=2)
+    
+    # convert to dict and write to yaml
+    with open('../trainable_params.yaml', 'w') as f:
+        yaml.dump(trainable_params_dict,f, default_flow_style=False)
+    
+
