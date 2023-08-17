@@ -94,10 +94,14 @@ if __name__ == "__main__":
     
     model_name_or_path = [
         'michiyasunaga/BioLinkBERT-base',
-       'emilyalsentzer/Bio_ClinicalBERT', 'yikuan8/Clinical-Longformer',
-       'michiyasunaga/LinkBERT-base', 'nlpie/bio-mobilebert',
+       'emilyalsentzer/Bio_ClinicalBERT',
+       'yikuan8/Clinical-Longformer',
+       'michiyasunaga/LinkBERT-base',
+       'nlpie/bio-mobilebert',
        'nlpie/distil-biobert', 
        'decapoda-research/llama-7b-hf',
+       'meta-llama/Llama-2-7b-hf',
+       'ybelkada/falcon-7b-sharded-bf16',
        '/mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/',
        '/mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/',
        'roberta-base',
