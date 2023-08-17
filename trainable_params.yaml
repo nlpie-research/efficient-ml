@@ -103,6 +103,27 @@ emilyalsentzer/Bio_ClinicalBERT:
     n_peft_params: 229376
     n_peft_params_perc: 0.21177376686808205
     total_params: 108311810
+meta-llama/Llama-2-7b-hf:
+  Full:
+    n_peft_params: 1151232
+    n_peft_params_perc: 0.017423500873770943
+    total_params: 6607351808
+  LORA:
+    n_peft_params: 4194304
+    n_peft_params_perc: 0.06347935030372762
+    total_params: 6607351808
+  PREFIX_TUNING:
+    n_peft_params: 5242880
+    n_peft_params_perc: 0.07934918787965951
+    total_params: 6607351808
+  PROMPT_TUNING:
+    n_peft_params: 40960
+    n_peft_params_perc: 0.00061991553030984
+    total_params: 6607351808
+  P_TUNING:
+    n_peft_params: 1151232
+    n_peft_params_perc: 0.017423500873770943
+    total_params: 6607351808
 michiyasunaga/BioLinkBERT-base:
   Full:
     n_peft_params: 229376
@@ -229,6 +250,27 @@ roberta-base:
     n_peft_params: 229376
     n_peft_params_perc: 0.1840202228418022
     total_params: 124647170
+ybelkada/falcon-7b-sharded-bf16:
+  Full:
+    n_peft_params: 1275328
+    n_peft_params_perc: 0.018424989682116734
+    total_params: 6921729792
+  LORA:
+    n_peft_params: 130547712
+    n_peft_params_perc: 1.8860561727053329
+    total_params: 6921729792
+  PREFIX_TUNING:
+    n_peft_params: 5816320
+    n_peft_params_perc: 0.08402986211224814
+    total_params: 6921729792
+  PROMPT_TUNING:
+    n_peft_params: 45440
+    n_peft_params_perc: 0.0006564832977519386
+    total_params: 6921729792
+  P_TUNING:
+    n_peft_params: 1275328
+    n_peft_params_perc: 0.018424989682116734
+    total_params: 6921729792
 yikuan8/Clinical-Longformer:
   Full:
     n_peft_params: 229376
