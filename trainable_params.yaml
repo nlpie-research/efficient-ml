@@ -1,0 +1,102 @@
+bert:
+  LORA:
+    n_trainable_params: 294912
+    n_trainable_params_perc: 0.26936593291473737
+    total_trainable_params: 109483778
+  PREFIX_TUNING:
+    n_trainable_params: 368640
+    n_trainable_params_perc: 0.33670741614342176
+    total_trainable_params: 109483778
+  PROMPT_TUNING:
+    n_trainable_params: 10756
+    n_trainable_params_perc: 0.009824286480139551
+    total_trainable_params: 109483778
+  P_TUNING:
+    n_trainable_params: 229376
+    n_trainable_params_perc: 0.20950683671146242
+    total_trainable_params: 109483778
+distil-biobert:
+  LORA:
+    n_trainable_params: 147456
+    n_trainable_params_perc: 0.2241497999728751
+    total_trainable_params: 65784578
+  PREFIX_TUNING:
+    n_trainable_params: 184320
+    n_trainable_params_perc: 0.2801872499660939
+    total_trainable_params: 65784578
+  PROMPT_TUNING:
+    n_trainable_params: 10756
+    n_trainable_params_perc: 0.016350336700495363
+    total_trainable_params: 65784578
+  P_TUNING:
+    n_trainable_params: 229376
+    n_trainable_params_perc: 0.34867746662447235
+    total_trainable_params: 65784578
+llama-7b:
+  LORA:
+    n_trainable_params: 4194304
+    n_trainable_params_perc: 0.06347935030372762
+    total_trainable_params: 6607351808
+  PREFIX_TUNING:
+    n_trainable_params: 5242880
+    n_trainable_params_perc: 0.07934918787965951
+    total_trainable_params: 6607351808
+  PROMPT_TUNING:
+    n_trainable_params: 57344
+    n_trainable_params_perc: 0.000867881742433776
+    total_trainable_params: 6607351808
+  P_TUNING:
+    n_trainable_params: 1151232
+    n_trainable_params_perc: 0.017423500873770943
+    total_trainable_params: 6607351808
+mobile-biobert:
+  LORA:
+    n_trainable_params: 221184
+    n_trainable_params_perc: 0.8997468729703891
+    total_trainable_params: 24582914
+  PREFIX_TUNING:
+    n_trainable_params: 491520
+    n_trainable_params_perc: 1.9994374954897536
+    total_trainable_params: 24582914
+  PROMPT_TUNING:
+    n_trainable_params: 3332
+    n_trainable_params_perc: 0.013554129506371783
+    total_trainable_params: 24582914
+  P_TUNING:
+    n_trainable_params: 158464
+    n_trainable_params_perc: 0.644610317556332
+    total_trainable_params: 24582914
+roberta-base:
+  LORA:
+    n_trainable_params: 294912
+    n_trainable_params_perc: 0.23659742936803138
+    total_trainable_params: 124647170
+  PREFIX_TUNING:
+    n_trainable_params: 368640
+    n_trainable_params_perc: 0.29574678671003923
+    total_trainable_params: 124647170
+  PROMPT_TUNING:
+    n_trainable_params: 1191940
+    n_trainable_params_perc: 0.956251152753809
+    total_trainable_params: 124647170
+  P_TUNING:
+    n_trainable_params: 229376
+    n_trainable_params_perc: 0.1840202228418022
+    total_trainable_params: 124647170
+tiny-biobert:
+  LORA:
+    n_trainable_params: 39936
+    n_trainable_params_perc: 0.2878319642527922
+    total_trainable_params: 13874762
+  PREFIX_TUNING:
+    n_trainable_params: 49920
+    n_trainable_params_perc: 0.3597899553159903
+    total_trainable_params: 13874762
+  PROMPT_TUNING:
+    n_trainable_params: 4372
+    n_trainable_params_perc: 0.03151045041349178
+    total_trainable_params: 13874762
+  P_TUNING:
+    n_trainable_params: 103064
+    n_trainable_params_perc: 0.7428163452461383
+    total_trainable_params: 13874762
