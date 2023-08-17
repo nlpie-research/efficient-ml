@@ -9,15 +9,16 @@
 #                      )
 # peft_methods=(Full) # LORA PREFIX PROMPT
 # nlpie/bio-mobilebert
-model_name_or_path=(nlpie/tiny-biobert
-                    roberta-base
-                    nlpie/distil-biobert
-                    emilyalsentzer/Bio_ClinicalBERT
-                    /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/)
+#                   nlpie/tiny-biobert
+                    # roberta-base
+                    # nlpie/distil-biobert
+                    # emilyalsentzer/Bio_ClinicalBERT
+                    # /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/
+model_name_or_path=(nlpie/bio-mobilebert)
 peft_methods=(LORA)
-tasks=(i2b2-2010-RE mimic-los mimic-mp)
+tasks=(i2b2-2010-RE mimic-los mimic-mp icd9-triage) # i2b2-2010-RE mimic-los mimic-mp icd9-triage
 max_epochs=5
-few_shot_num=(16 32 64 128 200)
+few_shot_num=(16 32 64 128)
 gpu=3
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/logs
 ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/ckpts

@@ -1,7 +1,7 @@
 /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/:
   Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.1840202228418022
+    n_peft_params: 124055040
+    n_peft_params_perc: 99.524955119318
     total_params: 124647170
   LORA:
     n_peft_params: 294912
@@ -21,8 +21,8 @@
     total_params: 124647170
 ? /mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/
 : Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.1840202228418022
+    n_peft_params: 124055040
+    n_peft_params_perc: 99.524955119318
     total_params: 124647170
   LORA:
     n_peft_params: 294912
@@ -42,8 +42,8 @@
     total_params: 124647170
 ? /mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_weighted/sampled_250000/07-07-2023--08-30/checkpoint-30000/
 : Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.1840202228418022
+    n_peft_params: 124055040
+    n_peft_params_perc: 99.524955119318
     total_params: 124647170
   LORA:
     n_peft_params: 294912
@@ -63,8 +63,8 @@
     total_params: 124647170
 decapoda-research/llama-7b-hf:
   Full:
-    n_peft_params: 1151232
-    n_peft_params_perc: 0.017423500873770943
+    n_peft_params: 6607343616
+    n_peft_params_perc: 99.99987601689394
     total_params: 6607351808
   LORA:
     n_peft_params: 4194304
@@ -84,8 +84,8 @@ decapoda-research/llama-7b-hf:
     total_params: 6607351808
 emilyalsentzer/Bio_ClinicalBERT:
   Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.21177376686808205
+    n_peft_params: 108310272
+    n_peft_params_perc: 99.99858002557616
     total_params: 108311810
   LORA:
     n_peft_params: 294912
@@ -105,8 +105,8 @@ emilyalsentzer/Bio_ClinicalBERT:
     total_params: 108311810
 meta-llama/Llama-2-7b-hf:
   Full:
-    n_peft_params: 1151232
-    n_peft_params_perc: 0.017423500873770943
+    n_peft_params: 6607343616
+    n_peft_params_perc: 99.99987601689394
     total_params: 6607351808
   LORA:
     n_peft_params: 4194304
@@ -126,8 +126,8 @@ meta-llama/Llama-2-7b-hf:
     total_params: 6607351808
 michiyasunaga/BioLinkBERT-base:
   Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.2119255383153143
+    n_peft_params: 108232704
+    n_peft_params_perc: 99.99857900792615
     total_params: 108234242
   LORA:
     n_peft_params: 294912
@@ -147,8 +147,8 @@ michiyasunaga/BioLinkBERT-base:
     total_params: 108234242
 michiyasunaga/LinkBERT-base:
   Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.21177376686808205
+    n_peft_params: 108310272
+    n_peft_params_perc: 99.99858002557616
     total_params: 108311810
   LORA:
     n_peft_params: 294912
@@ -168,8 +168,8 @@ michiyasunaga/LinkBERT-base:
     total_params: 108311810
 nlpie/bio-mobilebert:
   Full:
-    n_peft_params: 158464
-    n_peft_params_perc: 0.644610317556332
+    n_peft_params: 24581888
+    n_peft_params_perc: 99.99582636948573
     total_params: 24582914
   LORA:
     n_peft_params: 221184
@@ -189,8 +189,8 @@ nlpie/bio-mobilebert:
     total_params: 24582914
 nlpie/distil-biobert:
   Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.34867746662447235
+    n_peft_params: 65783040
+    n_peft_params_perc: 99.99766206602405
     total_params: 65784578
   LORA:
     n_peft_params: 147456
@@ -210,8 +210,8 @@ nlpie/distil-biobert:
     total_params: 65784578
 nlpie/tiny-biobert:
   Full:
-    n_peft_params: 103064
-    n_peft_params_perc: 0.7428163452461383
+    n_peft_params: 13874136
+    n_peft_params_perc: 99.99548821089688
     total_params: 13874762
   LORA:
     n_peft_params: 39936
@@ -231,8 +231,8 @@ nlpie/tiny-biobert:
     total_params: 13874762
 roberta-base:
   Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.1840202228418022
+    n_peft_params: 124055040
+    n_peft_params_perc: 99.524955119318
     total_params: 124647170
   LORA:
     n_peft_params: 294912
@@ -252,8 +252,8 @@ roberta-base:
     total_params: 124647170
 ybelkada/falcon-7b-sharded-bf16:
   Full:
-    n_peft_params: 1275328
-    n_peft_params_perc: 0.018424989682116734
+    n_peft_params: 6921720704
+    n_peft_params_perc: 99.99986870334044
     total_params: 6921729792
   LORA:
     n_peft_params: 130547712
@@ -273,8 +273,8 @@ ybelkada/falcon-7b-sharded-bf16:
     total_params: 6921729792
 yikuan8/Clinical-Longformer:
   Full:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.15429467665203422
+    n_peft_params: 148068864
+    n_peft_params_perc: 99.60169107977308
     total_params: 148660994
   LORA:
     n_peft_params: 884736

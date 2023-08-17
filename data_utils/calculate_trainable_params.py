@@ -21,7 +21,7 @@ import sys
 sys.path.append("../")
 from peft_trainer import create_peft_config
 import yaml
-
+import copy
 
 def get_number_of_trainable_params(model_names:list,
                                    peft_types:list,
@@ -56,25 +56,30 @@ def get_number_of_trainable_params(model_names:list,
         for peft_method in tqdm(peft_types, desc=f"model type: {model_name_or_path}"):
             
             if peft_method == "Full":
-                peft_model = model
+                peft_model = copy.deepcopy(model)
             else:
                 # set up some PEFT params
                 peft_config, lr = create_peft_config(peft_method, model_name_or_path,task_type)
-                peft_model = get_peft_model(model, peft_config)
+                peft_model = get_peft_model(copy.deepcopy(model), peft_config)
                 print(f"peft config is: {peft_config}")
-                model.print_trainable_parameters()
+                peft_model.print_trainable_parameters()
                 
             # lets also confirm this directly and save to args
             # The reason base_model is called twice because the
             # get_peft_model adds an additional wrapper arounf the
             # original base model
             n_trainable_params = count_trainable_parameters(peft_model)
+            print(f"n_trainable_params: {n_trainable_params}")
 
             if hasattr(peft_model, 'classifier'):
                 n_classifier_params = count_trainable_parameters(peft_model.classifier)
+                
             else:
                 n_classifier_params = count_trainable_parameters(peft_model.score)
+            
+            print(f"n_classifier_params: {n_classifier_params}")
             n_peft_params = n_trainable_params - n_classifier_params
+            print(f"n_peft_params: {n_peft_params}")
             
             # proportion of total trainable params
             n_peft_params_perc = (n_peft_params / total_params) * 100

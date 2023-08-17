@@ -9,14 +9,15 @@
 # /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/                                                                                                 
 #                      )
 # peft_methods=(Full) # LORA PREFIX_TUNING PROMPT_TUNING P_TUNING
-model_name_or_path=(nlpie/bio-mobilebert
-                    nlpie/tiny-biobert
-                    roberta-base
-                    nlpie/distil-biobert
-                    emilyalsentzer/Bio_ClinicalBERT
-                    /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/)
-peft_methods=(PROMPT_TUNING LORA)
-tasks=(i2b2-2010-RE)
+# model_name_or_path=(nlpie/bio-mobilebert
+#                     nlpie/tiny-biobert
+#                     roberta-base
+#                     nlpie/distil-biobert
+#                     emilyalsentzer/Bio_ClinicalBERT
+#                     /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/)
+model_name_or_path=(nlpie/tiny-biobert)
+peft_methods=(LORA)
+tasks=(mimic-los mimic-mp)
 max_epochs=5
 gpu=1
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/logs

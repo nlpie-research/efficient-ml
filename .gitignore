@@ -1,3 +1,4 @@
 **/*Runs*
 .python-version
 __pycache__
+*.csv
