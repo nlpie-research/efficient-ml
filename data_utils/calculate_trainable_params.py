@@ -23,7 +23,7 @@ from peft_trainer import create_peft_config
 import yaml
 
 
-def get_number_of_trainable_params(model_type_mappings:dict,
+def get_number_of_trainable_params(model_names:list,
                                    peft_types:list,
                                    task_type:str = "SEQ_CLS",
                                    num_labels:int = 2):
@@ -31,10 +31,10 @@ def get_number_of_trainable_params(model_type_mappings:dict,
     # set up empty dicts to full for dfs
     model_peft_dict = {}
     
-    for model_type in model_type_mappings.keys():
+    for model_name_or_path in model_names:
         
         model_dict = {}
-        model_name_or_path = model_type_mappings[model_type]
+        # model_name_or_path = model_type_mappings[model_type]
         model_args = dict(pretrained_model_name_or_path=model_name_or_path, 
                           num_labels=num_labels, 
                           output_hidden_states=False, 
@@ -51,39 +51,59 @@ def get_number_of_trainable_params(model_type_mappings:dict,
             model.config.use_cache = False            
 
         # count total trainable params before peft
-        total_trainable_params = count_trainable_parameters(model)
+        total_params = count_trainable_parameters(model)
         
-        for peft_method in tqdm(peft_types, desc=f"model type: {model_type}"):
+        for peft_method in tqdm(peft_types, desc=f"model type: {model_name_or_path}"):
             
-            
-            # set up some PEFT params
-            peft_config, lr = create_peft_config(peft_method, model_name_or_path,task_type)
-            model = get_peft_model(model, peft_config)
-            print(f"peft config is: {peft_config}")
-            # print(model)
-            model.print_trainable_parameters()
+            if peft_method != "Full":
+                # set up some PEFT params
+                peft_config, lr = create_peft_config(peft_method, model_name_or_path,task_type)
+                model = get_peft_model(model, peft_config)
+                print(f"peft config is: {peft_config}")
+                # print(model)
+                model.print_trainable_parameters()
             
             # lets also confirm this directly and save to args
+            # The reason base_model is called twice because the
+            # get_peft_model adds an additional wrapper arounf the
+            # original base model
             n_trainable_params = count_trainable_parameters(model)
+
+            if hasattr(model, 'classifier'):
+                n_classifier_params = count_trainable_parameters(model.classifier)
+            else:
+                n_classifier_params = count_trainable_parameters(model.score)
+            n_peft_params = n_trainable_params - n_classifier_params
+            
             # proportion of total trainable params
-            n_trainable_params_perc = (n_trainable_params / total_trainable_params) * 100
+            n_peft_params_perc = (n_peft_params / total_params) * 100
             
             # store the model name, peft method and number of trainable params
-            model_dict[peft_method] = {"n_trainable_params": n_trainable_params,
-                                 "total_trainable_params": total_trainable_params,
-                                 "n_trainable_params_perc": n_trainable_params_perc}
+            model_dict[peft_method] = {"n_peft_params": n_peft_params,
+                                 "total_params": total_params,
+                                 "n_peft_params_perc": n_peft_params_perc}
             
-        model_peft_dict[model_type] = model_dict
+        model_peft_dict[model_name_or_path] = model_dict
 
     return model_peft_dict
 
     
-   
-            
 # now save to yaml
 if __name__ == "__main__":
     
     
+    model_name_or_path = [
+        'michiyasunaga/BioLinkBERT-base',
+       'emilyalsentzer/Bio_ClinicalBERT', 'yikuan8/Clinical-Longformer',
+       'michiyasunaga/LinkBERT-base', 'nlpie/bio-mobilebert',
+       'nlpie/distil-biobert', 
+       'decapoda-research/llama-7b-hf',
+       '/mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/',
+       '/mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/',
+       'roberta-base',
+       '/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_weighted/sampled_250000/07-07-2023--08-30/checkpoint-30000/',
+       'nlpie/tiny-biobert']
+
 
     model_type_mappings = {
                 "roberta-base": "roberta-base",
@@ -94,10 +114,12 @@ if __name__ == "__main__":
                 "llama-7b": "meta-llama/Llama-2-7b-hf",
                 }
 
-    peft_types = ["PROMPT_TUNING","LORA", "PREFIX_TUNING", "P_TUNING"]
+    peft_types = ["PROMPT_TUNING","LORA", "PREFIX_TUNING", "P_TUNING", "Full"]
 
     
-    trainable_params_dict = get_number_of_trainable_params(model_type_mappings, peft_types, task_type="SEQ_CLS", num_labels=2)
+    trainable_params_dict = get_number_of_trainable_params(
+        model_name_or_path, peft_types, task_type="SEQ_CLS", num_labels=2)
+
     
     # convert to dict and write to yaml
     with open('../trainable_params.yaml', 'w') as f:
