@@ -21,7 +21,7 @@ from torchmetrics import AUROC
 import yaml
 from datasets import load_dataset, load_from_disk, concatenate_datasets, DatasetDict
 from loguru import logger as loguru_logger
-from peft import (LoraConfig, PeftType, PrefixTuningConfig,
+from peft import (LoraConfig,IA3Config, PeftType, PrefixTuningConfig,
                   PromptEncoderConfig, PromptTuningConfig, TaskType,
                   get_peft_config, get_peft_model, get_peft_model_state_dict,
                   prepare_model_for_int8_training,
@@ -246,7 +246,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--learning_rate",
                         type=float,
                         default = 3e-4)
-    parser.add_argument("--virtual_tokens",
+    parser.add_argument("--num_virtual_tokens",
                         type=int,
                         default = 10)  
     parser.add_argument("--few_shot_n",
@@ -683,6 +683,15 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
                                           num_virtual_tokens=args.num_virtual_tokens, 
                                           encoder_hidden_size=128)
         lr = args.learning_rate # default 1e-3
+        
+    elif peft_method == "IA3":
+        peft_type = PeftType.IA3
+        peft_config = IA3Config(task_type=task_type, inference_mode=False)
+        
+        lr = args.learning_rate # default 1e-3
+        
+    else:
+        raise NotImplementedError("peft method not implemented yet")
 
     return peft_config, lr
 
