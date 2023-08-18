@@ -1,3 +1,4 @@
+import sys
 import os
 from functools import partial
 # print cuda_visible_devices 
@@ -11,6 +12,7 @@ from functools import partial
 import argparse
 import json
 from datetime import datetime
+import traceback
 
 import evaluate
 import numpy as np
@@ -35,6 +37,8 @@ from transformers import (AutoModelForSequenceClassification,
                           Trainer, TrainingArguments,
                           get_linear_schedule_with_warmup, set_seed)
 from data_utils.model_utils import count_trainable_parameters
+
+
 
 '''
 Script to train a prefix-tuning model on a given dataset. 
@@ -768,11 +772,11 @@ def main() -> None:
         if task_type == "SEQ_CLS":
             ds_type = "classification"
             ds_info = DatasetInfo(name=data_dir, 
-            metric="f1", load_from_disk=True,
-            ds_type=ds_type, isMultiSentence=False,
-            lr=[5e-5, 2e-5, 1e-5], epochs=3,
-            batch_size=[train_batch_size],
-            runs=1)        
+                        metric="f1", load_from_disk=True,
+                        ds_type=ds_type, isMultiSentence=False,
+                        lr=[5e-5, 2e-5, 1e-5], epochs=3,
+                        batch_size=[train_batch_size],
+                        runs=1)        
             data_tuple = load_datasets(args = args, info=ds_info, tokenizer=tokenizer)
             tokenized_datasets = DatasetDict()
             tokenized_datasets["train"] = data_tuple[0]
@@ -868,7 +872,9 @@ def main() -> None:
         peft_config = None
     else:
         # set up some PEFT params
-        peft_config, lr = create_peft_config(peft_method, model_name_or_path,task_type)
+        peft_config, lr = create_peft_config(args=args, peft_method=peft_method, 
+                                             model_name_or_path=model_name_or_path, 
+                                             task_type=task_type)
         model = get_peft_model(model, peft_config)
         print(f"peft config is: {peft_config}")
         # print(model)
@@ -967,4 +973,14 @@ def main() -> None:
 
 # run script
 if __name__ == "__main__":
-    main()
+    
+    try:
+        main()
+    except:
+        cmd = sys.argv
+        m = cmd[cmd.index('--model_name_or_path')+1].split('/')[-1]
+        t = cmd[cmd.index('--task')+1]
+        p = cmd[cmd.index('--peft_method')+1]
+        error_log_file = f'./Runs/{m}_{t}_{p}.err'
+        with open(error_log_file, 'w') as errf:
+            errf.write(traceback.format_exc())

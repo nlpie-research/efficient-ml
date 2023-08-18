@@ -16,7 +16,7 @@ do
     echo $peft_method
     split=(${model_name_or_path//\// })
     model_name=${split[-1]}
-    run_logs="./Runs/"$model_name"_"$task"_"$peft_method".log"
+    # run_logs="./Runs/"$model_name"_"$task"_"$peft_method".log"
     echo
     
     # for num in "${few_shot_num[@]}"
@@ -28,6 +28,7 @@ do
         --task "$task" \
         --peft_method "$peft_method" \
         --log_save_dir $log_save_dir \
-        --ckpt_save_dir $ckpt_save_dir > "$run_logs"
+        --ckpt_save_dir $ckpt_save_dir
     # fi
+    break
 done
