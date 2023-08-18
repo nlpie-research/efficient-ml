@@ -229,7 +229,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--peft_method",
                         default="LORA", # LORA, PREFIX_TUNING, PROMPT_TUNING, P_TUNING
                         type=str,
-                        help="Which peft method to use")   
+                        help="Which peft method to use") 
+    parser.add_argument("--lora_rank",
+                        type=int,
+                        default = 8)
+    parser.add_argument("--lora_alpha",
+                        type=int,
+                        default = 16)
+    parser.add_argument("--lora_dropout",
+                        type=int,
+                        default = 0.1)
+    parser.add_argument("--learning_rate",
+                        type=float,
+                        default = 3e-4)
+    parser.add_argument("--virtual_tokens",
+                        type=int,
+                        default = 10)  
     parser.add_argument("--few_shot_n",
                         type=int,
                         default = None)
@@ -586,7 +601,7 @@ def compute_seq_cls_metrics(eval_pred):
             "f1_weighted":f1_weighted,
             "roc_auc_macro":roc_auc}
 
-def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -> tuple:
+def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_path:str, task_type:str) -> tuple:
     
     #TODO - add the target_modules to a config file
     if peft_method == "LORA":
@@ -595,9 +610,9 @@ def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -
         # in fact, add lora_alpha etc to config too. This is a bit of a mess     
         if "falcon" in model_name_or_path.lower():
             loguru_logger.info("Using falcon config")
-            lora_alpha = 16
-            lora_dropout = 0.1
-            lora_r = 64
+            lora_alpha = args.lora_alpha
+            lora_dropout = args.lora_dropout
+            lora_r = args.lora_rank
 
             peft_config = LoraConfig(
                 lora_alpha=lora_alpha,
@@ -613,18 +628,18 @@ def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -
                     "dense_4h_to_h",
                 ]
             )
-            lr = 3e-4
+            lr = args.learning_rate
         elif "mobile" in model_name_or_path.lower():
             loguru_logger.info("Using mobile config")
             peft_type = PeftType.LORA
-            lr = 3e-4
+            lr = args.learning_rate # default 3e-4
             peft_config = LoraConfig(task_type=task_type, target_modules=["query", "key", "value"], inference_mode=False, 
                                     r=8, lora_alpha=16, lora_dropout=0.1)
             
         elif "longformer" in model_name_or_path.lower():
             loguru_logger.info("Using longformer config")
             peft_type = PeftType.LORA
-            lr = 3e-4
+            lr = args.learning_rate # default 3e-4
             peft_config = LoraConfig(task_type="SEQ_CLS", target_modules=["query","value","key", 
                                                          "query_global", 
                                                          "value_global",
@@ -633,16 +648,16 @@ def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -
             
         else:
             peft_type = PeftType.LORA
-            lr = 3e-4
+            lr = args.learning_rate # default 3e-4
             peft_config = LoraConfig(task_type=task_type, inference_mode=False, 
-                                    r=8, lora_alpha=16, lora_dropout=0.1)
+                                    r=args.lora_rank, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout)
             
     elif peft_method == "PREFIX_TUNING":
         loguru_logger.info("Using PREFIX_TUNING")
         peft_type = PeftType.PREFIX_TUNING
         peft_config = PrefixTuningConfig(task_type=task_type, 
-                                         num_virtual_tokens=20)
-        lr = 1e-2
+                                         num_virtual_tokens=args.num_virtual_tokens)
+        lr = args.learning_rate # default 1e-2
     elif peft_method == "PROMPT_TUNING":
         loguru_logger.info("Using PROMPT_TUNING")
         # i think we need to set the embedding dimension explicitly for prompt tuning for mobile bert
@@ -650,20 +665,20 @@ def create_peft_config(peft_method:str, model_name_or_path:str, task_type:str) -
             peft_type = PeftType.PROMPT_TUNING
             peft_config = PromptTuningConfig(task_type=task_type,
                                              token_dim = 128,
-                                            num_virtual_tokens=10)
+                                            num_virtual_tokens=args.num_virtual_tokens)
         else:
             peft_type = PeftType.PROMPT_TUNING
             peft_config = PromptTuningConfig(task_type=task_type, 
-                                            num_virtual_tokens=10)
+                                            num_virtual_tokens=args.num_virtual_tokens)
 
-        lr = 1e-3
+        lr = args.learning_rate # default 1e-3
     elif peft_method == "P_TUNING":
         loguru_logger.info("Using P_TUNING")
         peft_type = PeftType.P_TUNING
         peft_config = PromptEncoderConfig(task_type=task_type, 
-                                          num_virtual_tokens=20, 
+                                          num_virtual_tokens=args.num_virtual_tokens, 
                                           encoder_hidden_size=128)
-        lr = 1e-3
+        lr = args.learning_rate # default 1e-3
 
     return peft_config, lr
 
