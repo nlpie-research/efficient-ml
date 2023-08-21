@@ -22,8 +22,54 @@ sys.path.append("../")
 from peft_trainer import create_peft_config
 import yaml
 import copy
+import argparse
 
-def get_number_of_trainable_params(model_names:list,
+def parse_args() -> argparse.Namespace:
+
+    parser = argparse.ArgumentParser()
+    # Required parameters
+
+    parser.add_argument("--log_save_dir",
+                        default = "/mnt/sdc/niallt/saved_models/peft_training/logs",
+                        type=str,
+                        help = "The data path to save tb log files to")
+
+    parser.add_argument("--task_type",
+                        default="SEQ_CLS", # SEQ-CLS
+                        choices=["SEQ_CLS", "TOKEN_CLS"],
+                        type=str,
+                        help="name of dataset")
+
+    parser.add_argument("--peft_method",
+                        default="LORA", # LORA, PREFIX_TUNING, PROMPT_TUNING, P_TUNING
+                        type=str,
+                        help="Which peft method to use") 
+    parser.add_argument("--lora_rank",
+                        type=int,
+                        default = 8)
+    parser.add_argument("--lora_alpha",
+                        type=int,
+                        default = 16)
+    parser.add_argument("--lora_dropout",
+                        type=int,
+                        default = 0.1)
+    parser.add_argument("--learning_rate",
+                        type=float,
+                        default = 3e-4)
+    parser.add_argument("--num_virtual_tokens",
+                        type=int,
+                        default = 10)  
+
+
+    args = parser.parse_args()
+    return args
+
+# create args
+
+args = parse_args()
+
+def get_number_of_trainable_params(args:argparse.Namespace,
+                                   model_names:list,
                                    peft_types:list,
                                    task_type:str = "SEQ_CLS",
                                    num_labels:int = 2):
@@ -59,7 +105,7 @@ def get_number_of_trainable_params(model_names:list,
                 peft_model = copy.deepcopy(model)
             else:
                 # set up some PEFT params
-                peft_config, lr = create_peft_config(peft_method, model_name_or_path,task_type)
+                peft_config, lr = create_peft_config(args, peft_method, model_name_or_path, task_type)
                 peft_model = get_peft_model(copy.deepcopy(model), peft_config)
                 print(f"peft config is: {peft_config}")
                 peft_model.print_trainable_parameters()
@@ -101,13 +147,11 @@ if __name__ == "__main__":
     model_name_or_path = [
         'michiyasunaga/BioLinkBERT-base',
        'emilyalsentzer/Bio_ClinicalBERT',
-       'yikuan8/Clinical-Longformer',
+    #    'yikuan8/Clinical-Longformer',
        'michiyasunaga/LinkBERT-base',
        'nlpie/bio-mobilebert',
        'nlpie/distil-biobert', 
-       'decapoda-research/llama-7b-hf',
        'meta-llama/Llama-2-7b-hf',
-       'ybelkada/falcon-7b-sharded-bf16',
        '/mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/',
        '/mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/',
        'roberta-base',
@@ -124,11 +168,11 @@ if __name__ == "__main__":
                 "llama-7b": "meta-llama/Llama-2-7b-hf",
                 }
 
-    peft_types = ["PROMPT_TUNING","LORA", "PREFIX_TUNING", "P_TUNING", "Full"]
+    peft_types = ["PROMPT_TUNING","LORA", "PREFIX_TUNING", "P_TUNING", "IA3", "Full"]
 
     
     trainable_params_dict = get_number_of_trainable_params(
-        model_name_or_path, peft_types, task_type="SEQ_CLS", num_labels=2)
+        args, model_name_or_path, peft_types, task_type="SEQ_CLS", num_labels=2)
 
     
     # convert to dict and write to yaml

@@ -638,7 +638,7 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
             peft_type = PeftType.LORA
             lr = args.learning_rate # default 3e-4
             peft_config = LoraConfig(task_type=task_type, target_modules=["query", "key", "value"], inference_mode=False, 
-                                    r=8, lora_alpha=16, lora_dropout=0.1)
+                                    r=args.lora_rank, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout)
             
         elif "longformer" in model_name_or_path.lower():
             loguru_logger.info("Using longformer config")
@@ -647,7 +647,10 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
             peft_config = LoraConfig(task_type="SEQ_CLS", target_modules=["query","value","key", 
                                                          "query_global", 
                                                          "value_global",
-                                                         "key_global"] ,inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1)
+                                                         "key_global"] ,inference_mode=False,
+                                     r=args.lora_rank,
+                                     lora_alpha=args.lora_alpha,
+                                     lora_dropout=args.lora_dropout)
             
             
         else:
@@ -685,13 +688,36 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
         lr = args.learning_rate # default 1e-3
         
     elif peft_method == "IA3":
-        peft_type = PeftType.IA3
-        peft_config = IA3Config(task_type=task_type, inference_mode=False)
+        #TODO refactor any handling of target_modules to be done in the config
+        # need to handle specific model types having different target_modules
+        if "mobile" in model_name_or_path:
+            peft_type = PeftType.IA3
+            peft_config = IA3Config(task_type=task_type,
+                                    target_modules=["key",
+                                                    "value",
+                                                    "output.dense"
+                                                    ], 
+                                    feedforward_modules=['output.dense'], 
+                                    inference_mode=False)
+        elif "longformer" in model_name_or_path:            
+            peft_type = PeftType.IA3
+            peft_config = IA3Config(task_type=task_type,
+                                    target_modules=["query","value","key", 
+                                                         "query_global", 
+                                                         "value_global",
+                                                         "key_global", 
+                                                         "output.dense"],                                                   
+                                    feedforward_modules=['output.dense'], 
+                                    inference_mode=False)
+        
+        else:
+            peft_type = PeftType.IA3
+            peft_config = IA3Config(task_type=task_type, inference_mode=False)
         
         lr = args.learning_rate # default 1e-3
         
     else:
-        raise NotImplementedError("peft method not implemented yet")
+        raise NotImplementedError(f"peft method: {peft_method} not implemented yet")
 
     return peft_config, lr
 
@@ -855,7 +881,9 @@ def main() -> None:
                             device_map="auto"))
         
     if task_type == "SEQ_CLS":
+        loguru_logger.info("Using sequence classification")
         model = AutoModelForSequenceClassification.from_pretrained(**model_args)
+        loguru_logger.info(f"Model is: {model}")
     elif task_type == "TOKEN_CLS":
         model = AutoModelForTokenClassification.from_pretrained(**model_args)
     
@@ -986,6 +1014,7 @@ if __name__ == "__main__":
     try:
         main()
     except:
+        loguru_logger.warning("Error in main function. Saving error log to file")
         cmd = sys.argv
         m = cmd[cmd.index('--model_name_or_path')+1].split('/')[-1]
         t = cmd[cmd.index('--task')+1]

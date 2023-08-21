@@ -3,292 +3,273 @@
     n_peft_params: 124055040
     n_peft_params_perc: 99.524955119318
     total_params: 124647170
+  IA3:
+    n_peft_params: 64512
+    n_peft_params_perc: 0.05175568767425686
+    total_params: 124647170
   LORA:
     n_peft_params: 294912
     n_peft_params_perc: 0.23659742936803138
     total_params: 124647170
   PREFIX_TUNING:
-    n_peft_params: 368640
-    n_peft_params_perc: 0.29574678671003923
+    n_peft_params: 184320
+    n_peft_params_perc: 0.14787339335501962
     total_params: 124647170
   PROMPT_TUNING:
     n_peft_params: 7680
     n_peft_params_perc: 0.0061613913897924835
     total_params: 124647170
   P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.1840202228418022
+    n_peft_params: 221696
+    n_peft_params_perc: 0.1778588314520097
     total_params: 124647170
 ? /mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/
 : Full:
     n_peft_params: 124055040
     n_peft_params_perc: 99.524955119318
     total_params: 124647170
+  IA3:
+    n_peft_params: 64512
+    n_peft_params_perc: 0.05175568767425686
+    total_params: 124647170
   LORA:
     n_peft_params: 294912
     n_peft_params_perc: 0.23659742936803138
     total_params: 124647170
   PREFIX_TUNING:
-    n_peft_params: 368640
-    n_peft_params_perc: 0.29574678671003923
+    n_peft_params: 184320
+    n_peft_params_perc: 0.14787339335501962
     total_params: 124647170
   PROMPT_TUNING:
     n_peft_params: 7680
     n_peft_params_perc: 0.0061613913897924835
     total_params: 124647170
   P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.1840202228418022
+    n_peft_params: 221696
+    n_peft_params_perc: 0.1778588314520097
     total_params: 124647170
 ? /mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_weighted/sampled_250000/07-07-2023--08-30/checkpoint-30000/
 : Full:
     n_peft_params: 124055040
     n_peft_params_perc: 99.524955119318
     total_params: 124647170
+  IA3:
+    n_peft_params: 64512
+    n_peft_params_perc: 0.05175568767425686
+    total_params: 124647170
   LORA:
     n_peft_params: 294912
     n_peft_params_perc: 0.23659742936803138
     total_params: 124647170
   PREFIX_TUNING:
-    n_peft_params: 368640
-    n_peft_params_perc: 0.29574678671003923
+    n_peft_params: 184320
+    n_peft_params_perc: 0.14787339335501962
     total_params: 124647170
   PROMPT_TUNING:
     n_peft_params: 7680
     n_peft_params_perc: 0.0061613913897924835
     total_params: 124647170
   P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.1840202228418022
+    n_peft_params: 221696
+    n_peft_params_perc: 0.1778588314520097
     total_params: 124647170
-decapoda-research/llama-7b-hf:
-  Full:
-    n_peft_params: 6607343616
-    n_peft_params_perc: 99.99987601689394
-    total_params: 6607351808
-  LORA:
-    n_peft_params: 4194304
-    n_peft_params_perc: 0.06347935030372762
-    total_params: 6607351808
-  PREFIX_TUNING:
-    n_peft_params: 5242880
-    n_peft_params_perc: 0.07934918787965951
-    total_params: 6607351808
-  PROMPT_TUNING:
-    n_peft_params: 40960
-    n_peft_params_perc: 0.00061991553030984
-    total_params: 6607351808
-  P_TUNING:
-    n_peft_params: 1151232
-    n_peft_params_perc: 0.017423500873770943
-    total_params: 6607351808
 emilyalsentzer/Bio_ClinicalBERT:
   Full:
     n_peft_params: 108310272
     n_peft_params_perc: 99.99858002557616
+    total_params: 108311810
+  IA3:
+    n_peft_params: 64512
+    n_peft_params_perc: 0.05956137193164808
     total_params: 108311810
   LORA:
     n_peft_params: 294912
     n_peft_params_perc: 0.2722805574018198
     total_params: 108311810
   PREFIX_TUNING:
-    n_peft_params: 368640
-    n_peft_params_perc: 0.34035069675227475
+    n_peft_params: 184320
+    n_peft_params_perc: 0.17017534837613738
     total_params: 108311810
   PROMPT_TUNING:
     n_peft_params: 7680
     n_peft_params_perc: 0.007090639515672391
     total_params: 108311810
   P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.21177376686808205
+    n_peft_params: 221696
+    n_peft_params_perc: 0.20468312735240968
     total_params: 108311810
 meta-llama/Llama-2-7b-hf:
   Full:
     n_peft_params: 6607343616
     n_peft_params_perc: 99.99987601689394
     total_params: 6607351808
+  IA3:
+    n_peft_params: 614400
+    n_peft_params_perc: 0.0092987329546476
+    total_params: 6607351808
   LORA:
     n_peft_params: 4194304
     n_peft_params_perc: 0.06347935030372762
     total_params: 6607351808
   PREFIX_TUNING:
-    n_peft_params: 5242880
-    n_peft_params_perc: 0.07934918787965951
+    n_peft_params: 2621440
+    n_peft_params_perc: 0.03967459393982976
     total_params: 6607351808
   PROMPT_TUNING:
     n_peft_params: 40960
     n_peft_params_perc: 0.00061991553030984
     total_params: 6607351808
   P_TUNING:
-    n_peft_params: 1151232
-    n_peft_params_perc: 0.017423500873770943
+    n_peft_params: 1110272
+    n_peft_params_perc: 0.016803585343461103
     total_params: 6607351808
 michiyasunaga/BioLinkBERT-base:
   Full:
     n_peft_params: 108232704
     n_peft_params_perc: 99.99857900792615
     total_params: 108234242
+  IA3:
+    n_peft_params: 64512
+    n_peft_params_perc: 0.05960405765118215
+    total_params: 108234242
   LORA:
     n_peft_params: 294912
     n_peft_params_perc: 0.2724756921196898
     total_params: 108234242
   PREFIX_TUNING:
-    n_peft_params: 368640
-    n_peft_params_perc: 0.34059461514961226
+    n_peft_params: 184320
+    n_peft_params_perc: 0.17029730757480613
     total_params: 108234242
   PROMPT_TUNING:
     n_peft_params: 7680
     n_peft_params_perc: 0.007095721148950255
     total_params: 108234242
   P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.2119255383153143
+    n_peft_params: 221696
+    n_peft_params_perc: 0.20482981716636403
     total_params: 108234242
 michiyasunaga/LinkBERT-base:
   Full:
     n_peft_params: 108310272
     n_peft_params_perc: 99.99858002557616
     total_params: 108311810
+  IA3:
+    n_peft_params: 64512
+    n_peft_params_perc: 0.05956137193164808
+    total_params: 108311810
   LORA:
     n_peft_params: 294912
     n_peft_params_perc: 0.2722805574018198
     total_params: 108311810
   PREFIX_TUNING:
-    n_peft_params: 368640
-    n_peft_params_perc: 0.34035069675227475
+    n_peft_params: 184320
+    n_peft_params_perc: 0.17017534837613738
     total_params: 108311810
   PROMPT_TUNING:
     n_peft_params: 7680
     n_peft_params_perc: 0.007090639515672391
     total_params: 108311810
   P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.21177376686808205
+    n_peft_params: 221696
+    n_peft_params_perc: 0.20468312735240968
     total_params: 108311810
 nlpie/bio-mobilebert:
   Full:
     n_peft_params: 24581888
     n_peft_params_perc: 99.99582636948573
     total_params: 24582914
+  IA3:
+    n_peft_params: 58368
+    n_peft_params_perc: 0.23743320258940823
+    total_params: 24582914
   LORA:
     n_peft_params: 221184
     n_peft_params_perc: 0.8997468729703891
     total_params: 24582914
   PREFIX_TUNING:
-    n_peft_params: 491520
-    n_peft_params_perc: 1.9994374954897536
+    n_peft_params: 245760
+    n_peft_params_perc: 0.9997187477448768
     total_params: 24582914
   PROMPT_TUNING:
     n_peft_params: 1280
     n_peft_params_perc: 0.005206868477837899
     total_params: 24582914
   P_TUNING:
-    n_peft_params: 158464
-    n_peft_params_perc: 0.644610317556332
+    n_peft_params: 153344
+    n_peft_params_perc: 0.6237828436449804
     total_params: 24582914
 nlpie/distil-biobert:
   Full:
     n_peft_params: 65783040
     n_peft_params_perc: 99.99766206602405
     total_params: 65784578
+  IA3:
+    n_peft_params: 32256
+    n_peft_params_perc: 0.04903276874406643
+    total_params: 65784578
   LORA:
     n_peft_params: 147456
     n_peft_params_perc: 0.2241497999728751
     total_params: 65784578
   PREFIX_TUNING:
-    n_peft_params: 184320
-    n_peft_params_perc: 0.2801872499660939
+    n_peft_params: 92160
+    n_peft_params_perc: 0.14009362498304695
     total_params: 65784578
   PROMPT_TUNING:
     n_peft_params: 7680
     n_peft_params_perc: 0.011674468748587245
     total_params: 65784578
   P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.34867746662447235
+    n_peft_params: 221696
+    n_peft_params_perc: 0.3370029978758851
     total_params: 65784578
 nlpie/tiny-biobert:
   Full:
     n_peft_params: 13874136
     n_peft_params_perc: 99.99548821089688
     total_params: 13874762
+  IA3:
+    n_peft_params: 8544
+    n_peft_params_perc: 0.06157943465985218
+    total_params: 13874762
   LORA:
     n_peft_params: 39936
     n_peft_params_perc: 0.2878319642527922
     total_params: 13874762
   PREFIX_TUNING:
-    n_peft_params: 49920
-    n_peft_params_perc: 0.3597899553159903
+    n_peft_params: 24960
+    n_peft_params_perc: 0.17989497765799514
     total_params: 13874762
   PROMPT_TUNING:
     n_peft_params: 3120
     n_peft_params_perc: 0.022486872207249393
     total_params: 13874762
   P_TUNING:
-    n_peft_params: 103064
-    n_peft_params_perc: 0.7428163452461383
+    n_peft_params: 99944
+    n_peft_params_perc: 0.720329473038889
     total_params: 13874762
 roberta-base:
   Full:
     n_peft_params: 124055040
     n_peft_params_perc: 99.524955119318
     total_params: 124647170
+  IA3:
+    n_peft_params: 64512
+    n_peft_params_perc: 0.05175568767425686
+    total_params: 124647170
   LORA:
     n_peft_params: 294912
     n_peft_params_perc: 0.23659742936803138
     total_params: 124647170
   PREFIX_TUNING:
-    n_peft_params: 368640
-    n_peft_params_perc: 0.29574678671003923
+    n_peft_params: 184320
+    n_peft_params_perc: 0.14787339335501962
     total_params: 124647170
   PROMPT_TUNING:
     n_peft_params: 7680
     n_peft_params_perc: 0.0061613913897924835
     total_params: 124647170
   P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.1840202228418022
+    n_peft_params: 221696
+    n_peft_params_perc: 0.1778588314520097
     total_params: 124647170
-ybelkada/falcon-7b-sharded-bf16:
-  Full:
-    n_peft_params: 6921720704
-    n_peft_params_perc: 99.99986870334044
-    total_params: 6921729792
-  LORA:
-    n_peft_params: 130547712
-    n_peft_params_perc: 1.8860561727053329
-    total_params: 6921729792
-  PREFIX_TUNING:
-    n_peft_params: 5816320
-    n_peft_params_perc: 0.08402986211224814
-    total_params: 6921729792
-  PROMPT_TUNING:
-    n_peft_params: 45440
-    n_peft_params_perc: 0.0006564832977519386
-    total_params: 6921729792
-  P_TUNING:
-    n_peft_params: 1275328
-    n_peft_params_perc: 0.018424989682116734
-    total_params: 6921729792
-yikuan8/Clinical-Longformer:
-  Full:
-    n_peft_params: 148068864
-    n_peft_params_perc: 99.60169107977308
-    total_params: 148660994
-  LORA:
-    n_peft_params: 884736
-    n_peft_params_perc: 0.5951366099435607
-    total_params: 148660994
-  PREFIX_TUNING:
-    n_peft_params: 368640
-    n_peft_params_perc: 0.2479735874764836
-    total_params: 148660994
-  PROMPT_TUNING:
-    n_peft_params: 7680
-    n_peft_params_perc: 0.005166116405760074
-    total_params: 148660994
-  P_TUNING:
-    n_peft_params: 229376
-    n_peft_params_perc: 0.15429467665203422
-    total_params: 148660994

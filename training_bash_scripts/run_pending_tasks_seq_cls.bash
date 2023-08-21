@@ -29,6 +29,5 @@ do
         --peft_method "$peft_method" \
         --log_save_dir $log_save_dir \
         --ckpt_save_dir $ckpt_save_dir
-    # fi
-    break
+    # fi    
 done

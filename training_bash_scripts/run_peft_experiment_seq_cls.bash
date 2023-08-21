@@ -15,11 +15,11 @@
 #                     nlpie/distil-biobert
 #                     emilyalsentzer/Bio_ClinicalBERT
 #                     /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/)
-model_name_or_path=(nlpie/tiny-biobert)
-peft_methods=(LORA)
-tasks=(mimic-los mimic-mp)
+model_name_or_path=(nlpie/bio-mobilebert)
+peft_methods=(IA3)
+tasks=(mimic-los)
 max_epochs=5
-gpu=1
+gpu=0
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/logs
 ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/ckpts
 for task in "${tasks[@]}"
@@ -35,7 +35,8 @@ for task in "${tasks[@]}"
                 --task "$task" \
                 --peft_method "$peft_method" \
                 --log_save_dir $log_save_dir \
-                --ckpt_save_dir $ckpt_save_dir
+                --ckpt_save_dir $ckpt_save_dir \
+                --learning_rate 1e-3
         done
     done
 done
