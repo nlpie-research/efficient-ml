@@ -4,10 +4,10 @@ model_name_or_path=(roberta-base
                     nlpie/distil-biobert
                     nlpie/tiny-biobert
                     )
-peft_methods=(PROMPT_TUNING) # PREFIX_TUNING LORA PROMPT_TUNING
+peft_methods=(IA3) # PREFIX_TUNING LORA PROMPT_TUNING
 tasks=(i2b2-2010-NER i2b2-2012-NER i2b2-2014-NER) # i2b2-2010-NER 
 max_epochs=5
-gpu=4
+gpu=0
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/logs
 ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/ckpts
 for task in "${tasks[@]}"

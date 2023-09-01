@@ -14,10 +14,11 @@
                     # nlpie/distil-biobert
                     # emilyalsentzer/Bio_ClinicalBERT
                     # /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/
-model_name_or_path=(roberta-base 
-                    nlpie/bio-mobilebert)
-peft_methods=(IA3)
-tasks=(i2b2-2010-RE) # i2b2-2010-RE mimic-los mimic-mp icd9-triage
+                    # /mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_contrastive_max_epoch_2_weighted/sampled_250000/22-08-2023--16-32/checkpoint-14000/
+                    # /mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_weighted/sampled_250000/07-07-2023--08-30/checkpoint-30000/                    
+model_name_or_path=(/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_contrastive_max_epoch_2_weighted/sampled_250000/23-08-2023--08-42/checkpoint-14000)
+peft_methods=(LORA)
+tasks=(ICD9-Triage) # i2b2-2010-RE mimic-los mimic-mp ICD9-Triage
 max_epochs=5
 few_shot_num=(128)
 gpu=0
