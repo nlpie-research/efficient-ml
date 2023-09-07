@@ -17,7 +17,7 @@
 #                     /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/)
 model_name_or_path=(nlpie/bio-mobilebert)
 peft_methods=(IA3)
-tasks=(mimic-los)
+tasks=(ICD9-Triage mimic-mp)
 max_epochs=5
 gpu=0
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/logs

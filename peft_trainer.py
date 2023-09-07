@@ -224,6 +224,10 @@ def parse_args() -> argparse.Namespace:
                         default=False,
                         type=bool,
                         help='Run for a trivial single batch and single epoch.')
+    parser.add_argument('--save_adapter',
+                        default=True,
+                        type=bool,
+                        help='Whether or not to save the trained adapter weights')
 
     parser.add_argument("--optimizer",
                         default="adamw",
@@ -1003,7 +1007,9 @@ def main() -> None:
         
        
     # save the peft weights to a file
-    model.save_pretrained(f"{ckpt_dir}")
+    if args.save_adapter:
+        loguru_logger.info(f"Saving adapter weights to: {ckpt_dir}")
+        model.save_pretrained(f"{ckpt_dir}")
     
     # run evaluation on test set
     trainer.evaluate()

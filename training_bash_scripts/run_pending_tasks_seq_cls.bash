@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # method=$1
 max_epochs=5
-gpu=0
+gpu=3
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/logs
 ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/ckpts
 pending_tasks_file=./training_bash_scripts/pending_tasks_SEQ_CLS.csv
