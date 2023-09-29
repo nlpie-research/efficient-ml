@@ -785,7 +785,7 @@ def main() -> None:
         else:
             tokenizer_args["padding_side"] = "right"
     else:
-        if "roberta" in model_name_or_path:
+        if "roberta" in model_name_or_path or "declutr"in model_name_or_path:
             tokenizer_args["add_prefix_space"] = True
             
     if "llama" in model_name_or_path:
