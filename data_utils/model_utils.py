@@ -35,7 +35,10 @@ def get_model_size(model):
     """Returns size of PyTorch model in bytes"""
     model_size = sum(p.numel() for p in model.parameters() if p.requires_grad) * 4 / (1024**2)
     print("Model size (MB):", model_size)
-    return model_size
+    # return GB size too
+    #calculate size in GB
+    model_size_g = model_size / 1024
+    return model_size, model_size_g
 
 
 def get_full_model_size(model):
@@ -53,4 +56,5 @@ def get_full_model_size(model):
     
     total_size = (param_size + buffer_size + state_dict_size) / (1024**2)
     print("Total size (MB):", total_size)
-    return total_size
+    total_size_g = total_size / 1024
+    return total_size, total_size_g
