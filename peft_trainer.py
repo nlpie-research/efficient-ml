@@ -36,7 +36,7 @@ from transformers import (AutoModelForSequenceClassification,
                           LlamaForSequenceClassification, LlamaTokenizer,
                           Trainer, TrainingArguments,
                           get_linear_schedule_with_warmup, set_seed)
-from data_utils.model_utils import count_trainable_parameters
+from data_utils.model_utils import count_trainable_parameters, unfreeze_model, freeze_model
 
 
 
@@ -225,8 +225,7 @@ def parse_args() -> argparse.Namespace:
                         type=bool,
                         help='Run for a trivial single batch and single epoch.')
     parser.add_argument('--save_adapter',
-                        default=True,
-                        type=bool,
+                        action = "store_true",
                         help='Whether or not to save the trained adapter weights')
 
     parser.add_argument("--optimizer",
@@ -264,10 +263,9 @@ def parse_args() -> argparse.Namespace:
                         default=False,
                         type=bool,
                         help='Whether or not to combine the validation and test datasets')
-    parser.add_argument('--sensitivity',
-                        default=False,
-                        type=bool,
-                        help='Run sensitivity trials - investigating the influence of number of transformer layers.')
+    parser.add_argument('--unfreeze_all',
+                        action = "store_true",
+                        help='Whether to unfreeze all layers of the model - even after PEFT')
     parser.add_argument('--no_cuda',
                         action = "store_true",        
                         help='Whether to use cuda/gpu or just use CPU ')
@@ -743,6 +741,7 @@ def main() -> None:
     eval_batch_size = args.eval_batch_size
     num_epochs = args.max_epochs
     
+    
     # set up some variables to add to checkpoint and logs filenames
     time_now = str(datetime.now().strftime("%d-%m-%Y--%H-%M"))
     
@@ -924,7 +923,15 @@ def main() -> None:
         # lets also confirm this directly and save to args
         args.n_trainable_params = count_trainable_parameters(model)
         
+    # if we want to unfreeze all layers - do so here
+    if args.unfreeze_all:
+        #NOTE - right now we manually set the logs dir to a different folder
+        loguru_logger.warning("Unfreezing all layers!!!")
+        unfreeze_model(model)
+        # log trainable params now
+        model.print_trainable_parameters()
         
+    
     # send move to device i.e. cuda
     model.to(device)
     
