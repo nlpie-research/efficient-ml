@@ -35,7 +35,8 @@ from transformers import (AutoModelForSequenceClassification,
                           DataCollatorForTokenClassification,
                           LlamaForSequenceClassification, LlamaTokenizer,
                           Trainer, TrainingArguments,
-                          get_linear_schedule_with_warmup, set_seed)
+                          get_linear_schedule_with_warmup, 
+                          get_constant_schedule, set_seed)
 from data_utils.model_utils import count_trainable_parameters, unfreeze_model, freeze_model
 
 
@@ -942,12 +943,15 @@ def main() -> None:
     # setup optimizer and lr_scheduler
     optimizer = AdamW(params=model.parameters(), lr=lr)    
 
-    # Instantiate scheduler
+    # # Instantiate scheduler
     lr_scheduler = get_linear_schedule_with_warmup(
         optimizer=optimizer,
         num_warmup_steps=0.06 * (len(tokenized_datasets['train'])/train_batch_size * num_epochs),
         num_training_steps=(len(tokenized_datasets['train'])/train_batch_size * num_epochs),
     )
+    
+    # add constant scheduler
+    # lr_scheduler = get_constant_schedule(optimizer=optimizer)
     
     monitor_metric_name = "f1_macro"
     
