@@ -21,13 +21,13 @@ model_name_or_path=(nlpie/bio-mobilebert
                     roberta-base
                     nlpie/distil-biobert
                     dmis-lab/biobert-v1.1)
-peft_methods=(LORA)
+peft_methods=(Full)
 tasks=(mimic-mp) # i2b2-2010-RE mimic-los mimic-mp ICD9-Triage
 max_epochs=5
 few_shot_num=(8 16 32 64 128 256)
-gpu=1
-log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/fewshot_sensitivity/logs
-ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/fewshot_sensitivity/ckpts
+gpu=0
+log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/time_budget_callback/logs
+ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/time_budget_callback/ckpts
 for task in "${tasks[@]}"
     do
     for model in "${model_name_or_path[@]}"
@@ -36,7 +36,7 @@ for task in "${tasks[@]}"
             do
             for peft_method in "${peft_methods[@]}"
                 do
-                CUDA_VISIBLE_DEVICES="$gpu" python peft_trainer.py \
+                CUDA_VISIBLE_DEVICES="$gpu" python peft_trainer_time_budget.py \
                     --model_name_or_path "$model" \
                     --max_epochs "$max_epochs" \
                     --task "$task" \
