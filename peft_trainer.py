@@ -718,7 +718,7 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
             peft_config = IA3Config(task_type=task_type, inference_mode=False)
         
         lr = args.learning_rate # default 1e-3
-        
+       
     else:
         raise NotImplementedError(f"peft method: {peft_method} not implemented yet")
 
@@ -911,6 +911,14 @@ def main() -> None:
         loguru_logger.info("Using full finetuning")
         lr = 3e-5
         peft_config = None
+    elif peft_method == "Frozen_PLM":
+        loguru_logger.info("Using frozen PLM")
+        lr = 3e-5
+        peft_config = None
+        # freeze the base model
+        freeze_model(model.base_model)
+        print(f"Number of trainable params: {count_trainable_parameters(model)}")
+        args.n_trainable_params = count_trainable_parameters(model)
     else:
         # set up some PEFT params
         peft_config, lr = create_peft_config(args=args, peft_method=peft_method, 
