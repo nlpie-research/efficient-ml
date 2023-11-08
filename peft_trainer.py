@@ -13,6 +13,7 @@ import argparse
 import json
 from datetime import datetime
 import traceback
+import optuna
 
 import evaluate
 import numpy as np
@@ -34,9 +35,10 @@ from transformers import (AutoModelForSequenceClassification,
                           AutoModelForTokenClassification, AutoTokenizer,
                           DataCollatorForTokenClassification,
                           LlamaForSequenceClassification, LlamaTokenizer,
-                          Trainer, TrainingArguments,
+                          Trainer, TrainerControl, TrainerState, TrainingArguments,
                           get_linear_schedule_with_warmup, 
-                          get_constant_schedule, set_seed)
+                          get_constant_schedule, set_seed, TrainerCallback, 
+                          EarlyStoppingCallback)
 from data_utils.model_utils import count_trainable_parameters, unfreeze_model, freeze_model
 
 
@@ -57,6 +59,24 @@ python peft_trainer.py
     --model_name_or_path /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/
 
 '''
+
+class TimeBudgetCallback(TrainerCallback):
+    def __init__(self, time_limit:int, start_time: datetime):
+        self.time_limit = time_limit
+        self.start_time = start_time
+
+    def on_step_end(self, args: TrainingArguments, state: TrainerState, 
+                    control: TrainerControl, **kwargs):
+        elapsed_time = datetime.now() - self.start_time
+        if elapsed_time.seconds > self.time_limit:
+            control.should_training_stop = True
+            print("Time budget exceeded. Stopping training.")
+    
+    def on_evaluate(self, args: TrainingArguments, state: TrainerState, 
+                    control: TrainerControl, **kwargs):
+        elapsed_time = datetime.now() - self.start_time
+        print(f"Time budget callback: {elapsed_time.seconds} seconds elapsed.")
+    
 
 class DatasetInfo:
   def __init__(self, name,
@@ -245,7 +265,7 @@ def parse_args() -> argparse.Namespace:
                         type=int,
                         default = 16)
     parser.add_argument("--lora_dropout",
-                        type=int,
+                        type=float,
                         default = 0.1)
     parser.add_argument("--learning_rate",
                         type=float,
@@ -259,7 +279,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--eval_few_shot_n",
                         type=int,
                         default = 128)
-    
+    parser.add_argument("--optuna",
+                        action = "store_true",
+                        help='Whether or not to use optuna to tune hyperparameters')
     parser.add_argument('--combined_val_test_sets',
                         default=False,
                         type=bool,
@@ -270,7 +292,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--no_cuda',
                         action = "store_true",        
                         help='Whether to use cuda/gpu or just use CPU ')
-
+    parser.add_argument('--time-budget',
+                        default=-1,
+                        type=int,
+                        help='Time budget in seconds. If -1, no time budget is used.')
+    parser.add_argument('--early_stopping_patience',
+                        default=5,
+                        type=int,
+                        help='Early stopping patience in epochs.')
+    parser.add_argument('--early_stopping_threshold',
+                        default=0.0,
+                        type=float,
+                        help='Early stopping threshold.')
     parser.add_argument('--task_to_keys',
                         default = {
                                 "cola": ("sentence", None),
@@ -724,6 +757,55 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
 
     return peft_config, lr
 
+def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
+    
+    if args.peft_method != "LORA":
+        loguru_logger.info("Optuna only implemented for LORA at the moment. Exiting.")
+        return
+
+    def optuna_hp_space(trial):
+        return {
+            'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True)
+        }
+
+    def optuna_model_init(trial):
+        # Set the parameter space anyway to avoid issues while saving/loading
+        lora_rank = trial.suggest_categorical('lora_rank', [args.lora_rank])
+        lora_alpha = lora_rank * trial.suggest_categorical('lora_alpha', [0.3, 0.5, 1.0])
+        lora_dropout = trial.suggest_categorical('lora_dropout', [0.1, 0.3, 0.5])
+
+        args.learning_rate = trial.params['learning_rate']
+        args.lora_dropout = lora_dropout
+        args.lora_rank = int(lora_rank)
+        args.lora_alpha = int(np.round(lora_alpha))
+
+        peft_config, _ = create_peft_config(args=args, 
+                                        peft_method=args.peft_method, 
+                                        model_name_or_path=args.model_name_or_path, 
+                                        task_type=args.task_type)
+        loguru_logger.info(f"Optuna params are: {trial.params}")
+        peft_model = get_peft_model(model, peft_config)
+        return peft_model
+        
+    def optuna_objective(metrics):
+        return metrics['eval_roc_auc_macro']
+
+
+    m = args.model_name_or_path.split("/")[-1]
+    study_name = f'{m}_LORARank-{args.lora_rank}'
+    storage_name = "sqlite:///./Runs/optuna/peft_optuna_v3.db"
+    
+    trainer.model_init = optuna_model_init
+    trainer.hyperparameter_search(
+                                direction="maximize",
+                                backend="optuna",
+                                n_trials=10,
+                                study_name=study_name,
+                                storage=storage_name,
+                                load_if_exists=True,
+                                hp_space=optuna_hp_space,
+                                compute_objective=optuna_objective)
+    
 # setup main function
 def main() -> None:
     args = parse_args()    
@@ -741,7 +823,8 @@ def main() -> None:
     train_batch_size = args.train_batch_size
     eval_batch_size = args.eval_batch_size
     num_epochs = args.max_epochs
-    
+    optuna = args.optuna
+    time_budget = args.time_budget
     
     # set up some variables to add to checkpoint and logs filenames
     time_now = str(datetime.now().strftime("%d-%m-%Y--%H-%M"))
@@ -907,6 +990,9 @@ def main() -> None:
     
     # if not pethod method supplied - do full-finetuning
     #TODO  - edit below
+    
+    # If we are using optuna, do not convert model to the peft version
+    # here
     if peft_method == "Full":
         loguru_logger.info("Using full finetuning")
         lr = 3e-5
@@ -914,16 +1000,17 @@ def main() -> None:
     else:
         # set up some PEFT params
         peft_config, lr = create_peft_config(args=args, peft_method=peft_method, 
-                                             model_name_or_path=model_name_or_path, 
-                                             task_type=task_type)
-        model = get_peft_model(model, peft_config)
+                                            model_name_or_path=model_name_or_path, 
+                                            task_type=task_type)
         print(f"peft config is: {peft_config}")
-        # print(model)
+        
+    if not optuna:
+        model = get_peft_model(model, peft_config)
         model.print_trainable_parameters()
-        
-        # lets also confirm this directly and save to args
-        args.n_trainable_params = count_trainable_parameters(model)
-        
+    
+    # lets also confirm this directly and save to args
+    args.n_trainable_params = count_trainable_parameters(model)
+    
     # if we want to unfreeze all layers - do so here
     if args.unfreeze_all:
         #NOTE - right now we manually set the logs dir to a different folder
@@ -936,19 +1023,7 @@ def main() -> None:
     # send move to device i.e. cuda
     model.to(device)
     
-    
     ######################### Trainer setup #########################
-    # set up trainer arguments
-
-    # setup optimizer and lr_scheduler
-    optimizer = AdamW(params=model.parameters(), lr=lr)    
-
-    # # Instantiate scheduler
-    lr_scheduler = get_linear_schedule_with_warmup(
-        optimizer=optimizer,
-        num_warmup_steps=0.06 * (len(tokenized_datasets['train'])/train_batch_size * num_epochs),
-        num_training_steps=(len(tokenized_datasets['train'])/train_batch_size * num_epochs),
-    )
     
     # add constant scheduler
     # lr_scheduler = get_constant_schedule(optimizer=optimizer)
@@ -963,19 +1038,30 @@ def main() -> None:
                                  label_list=all_ner_tags, 
                                  metric=metric)
     
+    # setup optimizer and lr_scheduler
+    # optimizer = AdamW(params=model.parameters(), lr=lr)
+
+    # Instantiate scheduler
+    # lr_scheduler = get_linear_schedule_with_warmup(
+    #     optimizer=optimizer,
+    #     num_warmup_steps=0.06 * (len(tokenized_datasets['train'])/train_batch_size * num_epochs),
+    #     num_training_steps=(len(tokenized_datasets['train'])/train_batch_size * num_epochs),
+    # )
+    num_warmup_steps = 0.06 * (len(tokenized_datasets['train'])/train_batch_size * num_epochs)
+
     train_args = TrainingArguments(
         output_dir = f"{ckpt_dir}/",
         evaluation_strategy = args.evaluation_strategy,
         eval_steps = args.eval_every_steps,
         logging_steps = args.log_every_steps,
         logging_first_step = True,    
-        save_strategy = args.saving_strategy,
+        save_strategy = args.evaluation_strategy, # args.saving_strategy,
         save_steps = args.save_every_steps,        
         per_device_train_batch_size = train_batch_size,
         per_device_eval_batch_size = eval_batch_size,
         num_train_epochs=args.max_epochs,
         weight_decay=0.01,
-        load_best_model_at_end=False,
+        load_best_model_at_end=True,
         metric_for_best_model=monitor_metric_name,
         push_to_hub=False,
         logging_dir = f"{logging_dir}/",
@@ -984,12 +1070,22 @@ def main() -> None:
         overwrite_output_dir=True,
         fp16 = fp16_flag,
         no_cuda = args.no_cuda, # for cpu only
+
+        lr_scheduler_type = 'linear',
+        warmup_ratio = 0.06,
+        learning_rate = lr,
+
         # use_ipex = args.use_ipex # for cpu only
         # remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
         # label_names = ["labels"],#FIXME - this is a hack to get around the fact that the peft model changes the output format and this causes issues with the trainer
     )
     
-   
+    callbacks = []
+    if time_budget != -1:
+        time_budget = TimeBudgetCallback(time_limit=time_budget, 
+                                            start_time=datetime.now())
+        callbacks.append(time_budget)
+    
     # setup normal trainer
     trainer = Trainer(
         model,
@@ -999,31 +1095,42 @@ def main() -> None:
         tokenizer=tokenizer,
         compute_metrics=compute_metrics,         
         data_collator=collate_fn,
-        optimizers =(optimizer, lr_scheduler)
+        # optimizers =(optimizer, lr_scheduler),
+        callbacks=callbacks
         )
-    # run training
-    trainer.train()
-    
 
+    # If not using optuna, run normal training and logging.
+    if not optuna:
 
-    # save the args/params to a text/yaml file
-    with open(f'{logging_dir}/config.txt', 'w') as f:
-        json.dump(args.__dict__, f, indent=2)
-        
-    with open(f'{logging_dir}/config.yaml', 'w') as f:
-        yaml.dump(args.__dict__, f) 
-    # also save trainer args
-    with open(f'{logging_dir}/all_trainer_args.yaml', 'w') as f:
-        yaml.dump(trainer.args.__dict__, f)   
-        
-       
-    # save the peft weights to a file
-    if args.save_adapter:
-        loguru_logger.info(f"Saving adapter weights to: {ckpt_dir}")
-        model.save_pretrained(f"{ckpt_dir}")
+        early_stopping = EarlyStoppingCallback(
+                        early_stopping_patience=args.early_stopping_patience, 
+                        early_stopping_threshold=args.early_stopping_threshold)
+        trainer.add_callback(early_stopping)
+
+        # run training
+        trainer.train()
     
-    # run evaluation on test set
-    trainer.evaluate()
+        # save the args/params to a text/yaml file
+        with open(f'{logging_dir}/config.txt', 'w') as f:
+            json.dump(args.__dict__, f, indent=2)
+            
+        with open(f'{logging_dir}/config.yaml', 'w') as f:
+            yaml.dump(args.__dict__, f) 
+        # also save trainer args
+        with open(f'{logging_dir}/all_trainer_args.yaml', 'w') as f:
+            yaml.dump(trainer.args.__dict__, f)   
+            
+        
+        # save the peft weights to a file
+        if args.save_adapter:
+            loguru_logger.info(f"Saving adapter weights to: {ckpt_dir}")
+            model.save_pretrained(f"{ckpt_dir}")
+        
+        # run evaluation on test set
+        trainer.evaluate(eval_dataset=tokenized_datasets["test"], 
+                         metric_key_prefix="test")
+    else:
+        tune_hyperparams(model, args, trainer)
 
 # run script
 if __name__ == "__main__":
@@ -1036,6 +1143,12 @@ if __name__ == "__main__":
         m = cmd[cmd.index('--model_name_or_path')+1].split('/')[-1]
         t = cmd[cmd.index('--task')+1]
         p = cmd[cmd.index('--peft_method')+1]
-        error_log_file = f'./Runs/{m}_{t}_{p}.err'
+        if '--few_shot_n' in cmd:
+            f = cmd[cmd.index('--few_shot_n')+1]
+        else:
+            f = 'full'
+        error_log_file = f'./Runs/{m}_fewshot{f}_{t}_{p}.err'
         with open(error_log_file, 'w') as errf:
             errf.write(traceback.format_exc())
+
+
