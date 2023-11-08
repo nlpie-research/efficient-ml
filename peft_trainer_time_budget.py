@@ -148,11 +148,11 @@ def parse_args() -> argparse.Namespace:
                         type=str,
                         help = "col name for the column containing the text")
     parser.add_argument("--log_save_dir",
-                        default = "/mnt/sdc/niallt/saved_models/peft_training/logs",
+                        default = "/mnt/sdd/niallt/saved_models/peft/logs",
                         type=str,
                         help = "The data path to save tb log files to")
     parser.add_argument("--ckpt_save_dir",
-                        default = "/mnt/sdc/niallt/saved_models/peft_training/ckpts",
+                        default = "/mnt/sdd/niallt/saved_models/peft/ckpts",
                         type=str,
                         help = "The data path to save trained ckpts to")
     parser.add_argument("--max_length",
@@ -1007,7 +1007,7 @@ def main() -> None:
         # label_names = ["labels"],#FIXME - this is a hack to get around the fact that the peft model changes the output format and this causes issues with the trainer
     )
     
-    time_budget = TimeBudgetCallback(time_limit=2000, start_time=datetime.now())
+    time_budget = TimeBudgetCallback(time_limit=6000, start_time=datetime.now())
     # setup normal trainer
     trainer = Trainer(
         model,

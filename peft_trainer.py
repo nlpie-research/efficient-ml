@@ -36,7 +36,8 @@ from transformers import (AutoModelForSequenceClassification,
                           LlamaForSequenceClassification, LlamaTokenizer,
                           Trainer, TrainingArguments,
                           get_linear_schedule_with_warmup, 
-                          get_constant_schedule, set_seed)
+                          get_constant_schedule, set_seed,
+                          EarlyStoppingCallback,)
 from data_utils.model_utils import count_trainable_parameters, unfreeze_model, freeze_model
 
 
@@ -983,7 +984,8 @@ def main() -> None:
         per_device_eval_batch_size = eval_batch_size,
         num_train_epochs=args.max_epochs,
         weight_decay=0.01,
-        load_best_model_at_end=False,
+        load_best_model_at_end=True,
+        
         metric_for_best_model=monitor_metric_name,
         push_to_hub=False,
         logging_dir = f"{logging_dir}/",
@@ -991,7 +993,9 @@ def main() -> None:
         report_to = 'tensorboard',        
         overwrite_output_dir=True,
         fp16 = fp16_flag,
-        no_cuda = args.no_cuda, # for cpu only
+        no_cuda = args.no_cuda, 
+        
+        # for cpu only
         # use_ipex = args.use_ipex # for cpu only
         # remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
         # label_names = ["labels"],#FIXME - this is a hack to get around the fact that the peft model changes the output format and this causes issues with the trainer
