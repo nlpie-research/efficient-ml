@@ -1069,21 +1069,13 @@ def main() -> None:
         eval_steps = args.eval_every_steps,
         logging_steps = args.log_every_steps,
         logging_first_step = True,    
-<<<<<<< HEAD
-        save_strategy = args.saving_strategy if optuna else args.evaluation_strategy,
-=======
         save_strategy = 'no' if optuna else args.saving_strategy,
->>>>>>> f33d40d537369c6d123dcb09312a31224beeb959
         save_steps = args.save_every_steps,        
         per_device_train_batch_size = train_batch_size,
         per_device_eval_batch_size = eval_batch_size,
         num_train_epochs=args.max_epochs,
         weight_decay=0.01,
-<<<<<<< HEAD
-        load_best_model_at_end = not optuna,
-=======
         load_best_model_at_end=not optuna if args.saving_strategy != "no" else False,#fix this - we still want to be able to decide regardless of the optuna param
->>>>>>> f33d40d537369c6d123dcb09312a31224beeb959
         metric_for_best_model=monitor_metric_name,
         push_to_hub=False,
         logging_dir = f"{logging_dir}/",
