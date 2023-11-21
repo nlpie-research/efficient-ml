@@ -9,17 +9,19 @@
 # /mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/                                                                                                 
 #                      )
 # peft_methods=(Full) # LORA PREFIX_TUNING PROMPT_TUNING P_TUNING
-model_name_or_path=(nlpie/bio-mobilebert
-                    nlpie/tiny-biobert
-                    roberta-base
+model_name_or_path=(
+                    # nlpie/bio-mobilebert
+                    # nlpie/tiny-biobert
+                    # roberta-base
                     nlpie/distil-biobert
-                    dmis-lab/biobert-v1.1)
-peft_methods=(LORA Full)
+                    # dmis-lab/biobert-v1.1
+                    )
+peft_methods=(LORA)
 tasks=(mimic-mp)
 max_epochs=5
-gpu=0
-log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/time_budget_2000s/logs
-ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/time_budget_2000s/ckpts
+gpu=1
+log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/sanity_checking/logs
+ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/sanity_checking/ckpts
 for task in "${tasks[@]}"
     do
     for model in "${model_name_or_path[@]}"
@@ -27,11 +29,13 @@ for task in "${tasks[@]}"
         for peft_method in "${peft_methods[@]}"
             do
             export CUDA_VISIBLE_DEVICES="$gpu"
-            python peft_trainer_time_budget.py \
+            python peft_trainer.py \
                 --model_name_or_path "$model" \
                 --max_epochs "$max_epochs" \
-                --evaluation_strategy "steps" \
+                --evaluation_strategy "epoch" \
                 --eval_every_steps 200 \
+                --saving_strategy "epoch" \
+                --save_every_steps 200 \
                 --task "$task" \
                 --peft_method "$peft_method" \
                 --log_save_dir $log_save_dir \
