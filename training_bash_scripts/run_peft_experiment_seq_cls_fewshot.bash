@@ -20,7 +20,8 @@ model_name_or_path=(nlpie/bio-mobilebert
                     nlpie/tiny-biobert
                     roberta-base
                     nlpie/distil-biobert
-                    dmis-lab/biobert-v1.1)
+                    dmis-lab/biobert-v1.1
+                    )
 peft_methods=(Full)
 tasks=(mimic-mp) # i2b2-2010-RE mimic-los mimic-mp ICD9-Triage
 max_epochs=5

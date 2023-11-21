@@ -264,7 +264,7 @@ def parse_args() -> argparse.Namespace:
                         default = 8)
     parser.add_argument("--lora_alpha",
                         type=int,
-                        default = 16)
+                        default = 8)
     parser.add_argument("--lora_dropout",
                         type=float,
                         default = 0.1)
@@ -293,7 +293,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--no_cuda',
                         action = "store_true",        
                         help='Whether to use cuda/gpu or just use CPU ')
-    parser.add_argument('--time-budget',
+    parser.add_argument('--time_budget',
                         default=-1,
                         type=int,
                         help='Time budget in seconds. If -1, no time budget is used.')
@@ -1017,8 +1017,10 @@ def main() -> None:
                                             model_name_or_path=model_name_or_path, 
                                             task_type=task_type)
         print(f"peft config is: {peft_config}")
-        
-    if not optuna:
+    
+    # if we are using peft and not running optuna, get peft model
+    if not optuna and peft_method != "Full":
+
         model = get_peft_model(model, peft_config)
         model.print_trainable_parameters()
     
@@ -1067,13 +1069,21 @@ def main() -> None:
         eval_steps = args.eval_every_steps,
         logging_steps = args.log_every_steps,
         logging_first_step = True,    
+<<<<<<< HEAD
         save_strategy = args.saving_strategy if optuna else args.evaluation_strategy,
+=======
+        save_strategy = 'no' if optuna else args.saving_strategy,
+>>>>>>> f33d40d537369c6d123dcb09312a31224beeb959
         save_steps = args.save_every_steps,        
         per_device_train_batch_size = train_batch_size,
         per_device_eval_batch_size = eval_batch_size,
         num_train_epochs=args.max_epochs,
         weight_decay=0.01,
+<<<<<<< HEAD
         load_best_model_at_end = not optuna,
+=======
+        load_best_model_at_end=not optuna if args.saving_strategy != "no" else False,#fix this - we still want to be able to decide regardless of the optuna param
+>>>>>>> f33d40d537369c6d123dcb09312a31224beeb959
         metric_for_best_model=monitor_metric_name,
         push_to_hub=False,
         logging_dir = f"{logging_dir}/",
@@ -1082,7 +1092,6 @@ def main() -> None:
         overwrite_output_dir=True,
         fp16 = fp16_flag,
         no_cuda = args.no_cuda, # for cpu only
-
         lr_scheduler_type = 'linear',
         warmup_ratio = 0.06,
         learning_rate = lr,
@@ -1113,11 +1122,12 @@ def main() -> None:
 
     # If not using optuna, run normal training and logging.
     if not optuna:
-
-        early_stopping = EarlyStoppingCallback(
-                        early_stopping_patience=args.early_stopping_patience, 
-                        early_stopping_threshold=args.early_stopping_threshold)
-        trainer.add_callback(early_stopping)
+        # if the saving strategty is "no" then we do not want early stopping - as this requires saving checkpoints
+        if args.saving_strategy != "no":
+            early_stopping = EarlyStoppingCallback(
+                            early_stopping_patience=args.early_stopping_patience, 
+                            early_stopping_threshold=args.early_stopping_threshold)
+            trainer.add_callback(early_stopping)
 
         # run training
         trainer.train()
