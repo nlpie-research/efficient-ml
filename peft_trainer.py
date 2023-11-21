@@ -15,6 +15,7 @@ from datetime import datetime
 import traceback
 import optuna
 
+import copy
 import evaluate
 import numpy as np
 import torch
@@ -784,22 +785,27 @@ def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
                                         model_name_or_path=args.model_name_or_path, 
                                         task_type=args.task_type)
         loguru_logger.info(f"Optuna params are: {trial.params}")
-        peft_model = get_peft_model(model, peft_config)
+        
+        model_copy = copy.deepcopy(model)
+        peft_model = get_peft_model(model_copy, peft_config)
         return peft_model
         
     def optuna_objective(metrics):
         return metrics['eval_roc_auc_macro']
 
-
     m = args.model_name_or_path.split("/")[-1]
     study_name = f'{m}_LORARank-{args.lora_rank}'
-    storage_name = "sqlite:///./Runs/optuna/peft_optuna_v3.db"
+    storage_name = "sqlite:///./Runs/optuna/peft_optuna_v2.db"
     
+    # pruner = optuna.pruners.MedianPruner(
+    #                     n_startup_trials=10, 
+    #                     n_warmup_steps=5)
+
     trainer.model_init = optuna_model_init
     trainer.hyperparameter_search(
                                 direction="maximize",
                                 backend="optuna",
-                                n_trials=10,
+                                n_trials=20,
                                 study_name=study_name,
                                 storage=storage_name,
                                 load_if_exists=True,
@@ -1055,21 +1061,19 @@ def main() -> None:
     #     num_warmup_steps=0.06 * (len(tokenized_datasets['train'])/train_batch_size * num_epochs),
     #     num_training_steps=(len(tokenized_datasets['train'])/train_batch_size * num_epochs),
     # )
-    num_warmup_steps = 0.06 * (len(tokenized_datasets['train'])/train_batch_size * num_epochs)
-
     train_args = TrainingArguments(
         output_dir = f"{ckpt_dir}/",
         evaluation_strategy = args.evaluation_strategy,
         eval_steps = args.eval_every_steps,
         logging_steps = args.log_every_steps,
         logging_first_step = True,    
-        save_strategy = args.evaluation_strategy, # args.saving_strategy,
+        save_strategy = args.saving_strategy if optuna else args.evaluation_strategy,
         save_steps = args.save_every_steps,        
         per_device_train_batch_size = train_batch_size,
         per_device_eval_batch_size = eval_batch_size,
         num_train_epochs=args.max_epochs,
         weight_decay=0.01,
-        load_best_model_at_end=True,
+        load_best_model_at_end = not optuna,
         metric_for_best_model=monitor_metric_name,
         push_to_hub=False,
         logging_dir = f"{logging_dir}/",
