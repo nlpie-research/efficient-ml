@@ -6,8 +6,9 @@ task=mimic-mp
 peft_methods=(LORA)
 max_epochs=5
 gpu=3
-log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/time_budget_6000s/logs
-ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/time_budget_6000s/ckpts
+time_budget=6000
+log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/time_budget_"$time_budget"s/logs
+ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/time_budget_"$time_budget"s/ckpts
 for model in "${model_name_or_path[@]}"
     do
     for peft_method in "${peft_methods[@]}"
@@ -27,6 +28,7 @@ for model in "${model_name_or_path[@]}"
                                 --ckpt_save_dir $ckpt_save_dir \
                                 --learning_rate 0.00005 \
                                 --lora_rank 16 \
-                                --lora_alpha 32
+                                --lora_alpha 32 \
+                                --time_budget $time_budget \
     done
 done
