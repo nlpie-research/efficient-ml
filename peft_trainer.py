@@ -477,6 +477,7 @@ def load_datasets(args:argparse.Namespace, info:DatasetInfo, tokenizer:AutoToken
     elif info.type == "ner":
       # print(dataset)
       num_labels = len(dataset["info"][0]["all_ner_tags"])
+      loguru_logger.info(f"Number of labels for NER task is: {num_labels}")
       def mappingFunction(all_samples_per_split, **kargs):
         tokenized_samples = tokenizer.batch_encode_plus(all_samples_per_split["tokens"],
                                                         is_split_into_words=True, 
@@ -512,31 +513,60 @@ def load_datasets(args:argparse.Namespace, info:DatasetInfo, tokenizer:AutoToken
                                                 batched=True,
                                                 remove_columns=dataset["train"].column_names,
                                                 fn_kwargs={"padding": "do_not_pad"})
-      
-    tokenizedValDatasets = []
-
-    for name in info.validationSubsets:
+    # here we want to ensure we get both a validation and a test set
+    if "test" not in dataset:
         
-        
-        # Check if subset name exists in dataset
-        if name not in dataset:
-            loguru_logger.warning(f"Warning: Subset {name} not found in dataset")
-            continue 
-        
-        tokenizedValDataset = dataset[name].map(mappingFunction,
+        loguru_logger.info("No test set found. Creating test set from validation set")
+        temp_dataset = dataset["validation"].train_test_split(test_size=0.5, shuffle=True, seed=42)
+        # reassign the test set
+        # print(f"temp dataset is: {temp_dataset}")
+        dataset["validation"] = temp_dataset["train"]
+        dataset["test"] = temp_dataset["test"]  
+        # print(f"dataset is: {dataset}")
+       
+    
+    # do not merge the validation and test sets
+    if not args.combined_val_test_sets:
+        loguru_logger.info("Not combining validation and test sets! Creating test dataset")
+        tokenizedValDataset = dataset["validation"].map(mappingFunction,
                                                 batched=True,
-                                                remove_columns=dataset[name].column_names,
+                                                remove_columns=dataset["validation"].column_names,
+                                                fn_kwargs={"padding": "do_not_pad"})
+        tokenizedTestDataset = dataset["test"].map(mappingFunction,
+                                                batched=True,
+                                                remove_columns=dataset["test"].column_names,
                                                 fn_kwargs={"padding": "do_not_pad"})
         
-        tokenizedValDatasets.append(tokenizedValDataset)
+    else:
+        raise NotImplementedError("Combining validation and test sets not implemented yet")
+            
+            # tokenizedValDatasets.append(tokenizedValDataset)
+            
+        # tokenizedValDataset = dataset[name].map(mappingFunction,
+        #                                         batched=True,
+        #                                         remove_columns=dataset[name].column_names,
+        #                                         fn_kwargs={"padding": "do_not_pad"})
+        
+        # tokenizedValDatasets.append(tokenizedValDataset)
 
     if info.num_labels != None:
       num_labels = info.num_labels
 
     if info.type == "ner":
-        return tokenizedTrainDataset, tokenizedValDatasets, num_labels, dataset["info"][0]["all_ner_tags"]
+        # check if tokenized test dataset exists
+        if "tokenizedTestDataset" in locals():
+            print("Returning tokenized test dataset")
+            return tokenizedTrainDataset, tokenizedValDataset, tokenizedTestDataset, num_labels, dataset["info"][0]["all_ner_tags"]
+        else:
+            return tokenizedTrainDataset, tokenizedValDataset, num_labels, dataset["info"][0]["all_ner_tags"]
     else:
-        return tokenizedTrainDataset, tokenizedValDatasets, num_labels
+        # check if tokenized test dataset exists
+        if "tokenizedTestDataset" in locals():
+            print("Returning tokenized test dataset")
+            return tokenizedTrainDataset, tokenizedValDataset, tokenizedTestDataset, num_labels
+        else:
+            return tokenizedTrainDataset, tokenizedValDataset, num_labels
+        
 
 def compute_token_cls_metrics(eval_pred, label_list, metric):
     predictions, labels = eval_pred
@@ -906,10 +936,18 @@ def main() -> None:
                         batch_size=[train_batch_size],
                         runs=1)        
             data_tuple = load_datasets(args = args, info=ds_info, tokenizer=tokenizer)
-            tokenized_datasets = DatasetDict()
-            tokenized_datasets["train"] = data_tuple[0]
-            tokenized_datasets["validation"] = data_tuple[1][0]
-            num_labels = data_tuple[2]
+            # if we have test set i.e. an extra element in tuple, change the order
+            if len(data_tuple) == 4:
+                tokenized_datasets = DatasetDict()
+                tokenized_datasets["train"] = data_tuple[0]
+                tokenized_datasets["validation"] = data_tuple[1]
+                tokenized_datasets["test"] = data_tuple[2]
+                num_labels = data_tuple[3]
+            else:
+                tokenized_datasets = DatasetDict()
+                tokenized_datasets["train"] = data_tuple[0]
+                tokenized_datasets["validation"] = data_tuple[1]
+                num_labels = data_tuple[2]
         else:
             ds_type = "ner"        
             ds_info = DatasetInfo(name=data_dir, 
@@ -919,11 +957,22 @@ def main() -> None:
                         batch_size=[train_batch_size],
                         runs=1)        
             data_tuple = load_datasets(args=args, info=ds_info, tokenizer=tokenizer)
-            tokenized_datasets = DatasetDict()
-            tokenized_datasets["train"] = data_tuple[0]
-            tokenized_datasets["validation"] = data_tuple[1][0]
-            num_labels = data_tuple[2]
-            all_ner_tags = data_tuple[3]
+            # check if we have a test set
+            if len(data_tuple) == 5:
+                tokenized_datasets = DatasetDict()
+                tokenized_datasets["train"] = data_tuple[0]
+                tokenized_datasets["validation"] = data_tuple[1]
+                tokenized_datasets["test"] = data_tuple[2]
+                num_labels = data_tuple[3]
+                all_ner_tags = data_tuple[4]
+            else:
+                tokenized_datasets = DatasetDict()
+                tokenized_datasets["train"] = data_tuple[0]
+                tokenized_datasets["validation"] = data_tuple[1]
+                num_labels = data_tuple[2]
+                all_ner_tags = data_tuple[3]
+
+
     
     if "labels" not in tokenized_datasets["train"].features:
         tokenized_datasets = tokenized_datasets.rename_column(args.label_name, "labels")
@@ -946,12 +995,17 @@ def main() -> None:
 
         tokenized_datasets["train"] = concatenate_datasets(train_datasets)
 
-    print(f'Sample train data:\n{tokenized_datasets["train"][10]}')
+    print(f"Tokenized datasets: {tokenized_datasets}")
+    print(f'Sample train data:\n{tokenized_datasets["train"][1]}')
     print(f'\nSample train data (decoded):'+
-            f'{tokenizer.decode(tokenized_datasets["train"][10]["input_ids"])}')        
+            f'{tokenizer.decode(tokenized_datasets["train"][1]["input_ids"])}')        
     # print length of datasets
     print(f"Final tokenized train dataset:\n {tokenized_datasets['train']}")
-    print(f"tokenized evaluation datasets:\n {tokenized_datasets['validation']}")
+    print(f"tokenized validation dataset:\n {tokenized_datasets['validation']}")
+    # if we have separate test set 
+    if "test" in tokenized_datasets:
+        print(f"tokenized evaluation dataset:\n {tokenized_datasets['test']}")
+
     
 
     ######################### Model setup #########################
@@ -1141,8 +1195,12 @@ def main() -> None:
             model.save_pretrained(f"{ckpt_dir}")
         
         # run evaluation on test set
+        # remove callbacks here to avoid warnings
+        trainer.remove_callback(early_stopping)
         trainer.evaluate(eval_dataset=tokenized_datasets["test"], 
                          metric_key_prefix="test")
+        # trainer.predict(test_dataset=tokenized_datasets["test"], 
+        #             metric_key_prefix="test")
     else:
         tune_hyperparams(model, args, trainer)
 
