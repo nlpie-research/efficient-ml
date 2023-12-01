@@ -976,7 +976,10 @@ def main() -> None:
     
     if "labels" not in tokenized_datasets["train"].features:
         tokenized_datasets = tokenized_datasets.rename_column(args.label_name, "labels")
-        
+    
+    # print number of labels
+    loguru_logger.info(f"##### Number of labels is: {num_labels} #####")
+    
     # if we are doing few shot - we need to sample the training data
     if few_shot_n is not None:
         loguru_logger.info(f"Sampling {few_shot_n} samples per class")
@@ -1098,15 +1101,17 @@ def main() -> None:
     # add constant scheduler
     # lr_scheduler = get_constant_schedule(optimizer=optimizer)
     
-    monitor_metric_name = "f1_macro"
+    
     
     if task_type == "SEQ_CLS":
        compute_metrics = compute_seq_cls_metrics
+       monitor_metric_name = "f1_macro"
     else:
        metric = evaluate.load("seqeval")
        compute_metrics = partial(compute_token_cls_metrics, 
                                  label_list=all_ner_tags, 
                                  metric=metric)
+       monitor_metric_name = "f1"
     
     # setup optimizer and lr_scheduler
     # optimizer = AdamW(params=model.parameters(), lr=lr)
@@ -1170,6 +1175,7 @@ def main() -> None:
     if not optuna:
         # if the saving strategty is "no" then we do not want early stopping - as this requires saving checkpoints
         if args.saving_strategy != "no":
+            loguru_logger.info("Adding early stopping callback")
             early_stopping = EarlyStoppingCallback(
                             early_stopping_patience=args.early_stopping_patience, 
                             early_stopping_threshold=args.early_stopping_threshold)
@@ -1195,8 +1201,10 @@ def main() -> None:
             model.save_pretrained(f"{ckpt_dir}")
         
         # run evaluation on test set
-        # remove callbacks here to avoid warnings
-        trainer.remove_callback(early_stopping)
+        # remove early stopping callbacks here to avoid warnings if we have them - need to check if we did add it
+        if args.saving_strategy != "no":
+            trainer.remove_callback(early_stopping)
+            
         trainer.evaluate(eval_dataset=tokenized_datasets["test"], 
                          metric_key_prefix="test")
         # trainer.predict(test_dataset=tokenized_datasets["test"], 
