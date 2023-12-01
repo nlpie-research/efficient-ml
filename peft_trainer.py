@@ -26,7 +26,7 @@ from loguru import logger as loguru_logger
 from peft import (LoraConfig,IA3Config, PeftType, PrefixTuningConfig,
                   PromptEncoderConfig, PromptTuningConfig, TaskType,
                   get_peft_config, get_peft_model, get_peft_model_state_dict,
-                  prepare_model_for_int8_training,
+                  prepare_model_for_int8
                   prepare_model_for_kbit_training, set_peft_model_state_dict)
 from scipy.special import softmax
 from torch.optim import AdamW
