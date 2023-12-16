@@ -185,6 +185,10 @@ def parse_args() -> argparse.Namespace:
                         default = 32,
                         type=int,
                         help = "the size of evaluation batches")
+    parser.add_argument("--gradient_accumulation_steps",
+                        default = 1,
+                        type=int,
+                        help = "the number of gradient accumulation steps")
     parser.add_argument("--max_epochs",
                         default = 1,
                         type=int,
@@ -1058,6 +1062,11 @@ def main() -> None:
         model_args.update(dict(torch_dtype=torch.float16, 
                             load_in_8bit=True, 
                             device_map="auto"))
+    
+    # need to load in fp16 for llama models anyway
+    elif "falcon" in model_name_or_path or "llama" in model_name_or_path:
+        model_args.update(dict(torch_dtype=torch.float16,                            
+                            device_map="auto"))  
         
     if task_type == "SEQ_CLS":
         loguru_logger.info("Using sequence classification")
@@ -1071,6 +1080,8 @@ def main() -> None:
         loguru_logger.info("Setting pad token manually for falcon/llama model in the model config")
         model.config.use_cache = False
         model.config.pad_token_id = tokenizer.eos_token_id
+
+        fp16_flag = True
     
     # need to now prepare the 8bit models
     if args.eight_bit_training:
@@ -1176,6 +1187,7 @@ def main() -> None:
         lr_scheduler_type = 'linear',
         warmup_ratio = 0.06,
         learning_rate = lr,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
 
         # use_ipex = args.use_ipex # for cpu only
         # remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
