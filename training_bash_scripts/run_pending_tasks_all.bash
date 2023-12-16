@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-target_task=$1
+target_model=$1
 gpu=$2
 max_epochs=5
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/logs
@@ -9,8 +9,8 @@ for pt in $(cat "$pending_tasks_file")
 do
     IFS=$',' read -r model_name_or_path task peft_method <<< "$pt"
     
-    # Check if the task is the target task
-    if [ "$task" != "$target_task" ]; then
+    # Check if the model is the target model
+    if [ "$model_name_or_path" != "$target_model" ]; then
         continue
     fi
     
@@ -26,5 +26,6 @@ do
         --task "$task" \
         --peft_method "$peft_method" \
         --log_save_dir $log_save_dir \
-        --ckpt_save_dir $ckpt_save_dir
+        --ckpt_save_dir $ckpt_save_dir \
+        --saving_strategy epoch
 done
