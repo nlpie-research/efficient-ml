@@ -1163,7 +1163,7 @@ def main() -> None:
     #     num_warmup_steps=0.06 * (len(tokenized_datasets['train'])/train_batch_size * num_epochs),
     #     num_training_steps=(len(tokenized_datasets['train'])/train_batch_size * num_epochs),
     # )
-       
+
     train_args = TrainingArguments(
         output_dir = f"{ckpt_dir}/",
         evaluation_strategy = args.evaluation_strategy,
@@ -1185,8 +1185,7 @@ def main() -> None:
         overwrite_output_dir=True,
         fp16 = fp16_flag,
         no_cuda = args.no_cuda, # for cpu only
-        lr_scheduler_type = 'linear',
-        # warmup_ratio = 0.06,
+        lr_scheduler_type = 'linear' if num_epochs > 5 else 'constant',
         warmup_steps = 0.06 * (len(tokenized_datasets['train'])/train_batch_size * min(num_epochs, 5)),
         learning_rate = lr,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
