@@ -942,7 +942,8 @@ def main() -> None:
         tokenizer = AutoTokenizer.from_pretrained(**tokenizer_args)   
 
     if getattr(tokenizer, "pad_token_id") is None:
-        tokenizer.pad_token_id = tokenizer.eos_token_id
+        loguru_logger.info(f"Adding pad token manually! Setting pad token to eos token: {tokenizer.eos_token_id}")
+        tokenizer.pad_token_id = tokenizer.eos_token_id        
         
     if task_type == "SEQ_CLS":
         def collate_fn(examples):
@@ -1066,9 +1067,10 @@ def main() -> None:
         model = AutoModelForTokenClassification.from_pretrained(**model_args)
     
     # falcon model seems to use model config to define pad token and the remote code panicks if you don't set it
-    if "falcon" in model_name_or_path:
+    if "falcon" in model_name_or_path or "llama" in model_name_or_path:
+        loguru_logger.info("Setting pad token manually for falcon/llama model in the model config")
         model.config.use_cache = False
-        model.config.pad_token_id = tokenizer.pad_token_id
+        model.config.pad_token_id = tokenizer.eos_token_id
     
     # need to now prepare the 8bit models
     if args.eight_bit_training:
