@@ -1185,7 +1185,7 @@ def main() -> None:
         overwrite_output_dir=True,
         fp16 = fp16_flag,
         no_cuda = args.no_cuda, # for cpu only
-        lr_scheduler_type = 'linear' if num_epochs > 5 else 'constant',
+        lr_scheduler_type = 'constant' if time_budget != -1 else 'linear',
         warmup_steps = 0.06 * (len(tokenized_datasets['train'])/train_batch_size * min(num_epochs, 5)),
         learning_rate = lr,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
