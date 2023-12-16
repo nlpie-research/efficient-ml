@@ -185,6 +185,10 @@ def parse_args() -> argparse.Namespace:
                         default = 32,
                         type=int,
                         help = "the size of evaluation batches")
+    parser.add_argument("--gradient_accumulation_steps",
+                        default = 1,
+                        type=int,
+                        help = "the number of gradient accumulation steps")
     parser.add_argument("--max_epochs",
                         default = 1,
                         type=int,
@@ -789,8 +793,8 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
 
 def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
     
-    if args.peft_method != "LORA":
-        loguru_logger.info("Optuna only implemented for LORA at the moment. Exiting.")
+    if not (args.peft_method == "LORA" or args.peft_method == "IA3"):
+        loguru_logger.info(f"Optuna only implemented for LORA or IA3 at the moment. But got:{args.peft_method} Exiting.")
         return
 
     def optuna_hp_space(trial):
@@ -798,7 +802,8 @@ def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
             'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True)
         }
 
-    def optuna_model_init(trial):
+    def optuna_model_init_lora(trial):
+        assert args.peft_method == "LORA", "Optuna only implemented for LORA at the moment. Exiting."
         # Set the parameter space anyway to avoid issues while saving/loading
         lora_rank = trial.suggest_categorical('lora_rank', [args.lora_rank])
         lora_alpha = lora_rank * trial.suggest_categorical('lora_alpha', [0.3, 0.5, 1.0])
@@ -818,19 +823,47 @@ def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
         model_copy = copy.deepcopy(model)
         peft_model = get_peft_model(model_copy, peft_config)
         return peft_model
+    
+    def optuna_model_init_ia3(trial):
+        assert args.peft_method == "IA3", "Optuna only implemented for IA3 at the moment. Exiting."
+        
+        args.learning_rate = trial.params['learning_rate']
+        
+        peft_config, _ = create_peft_config(args=args,
+                                            peft_method=args.peft_method,
+                                            model_name_or_path=args.model_name_or_path,
+                                            task_type=args.task_type)
+        loguru_logger.info(f"Optuna params are: {trial.params}")
+        
+        model_copy = copy.deepcopy(model)
+        peft_model = get_peft_model(model_copy, peft_config)
+        return peft_model
         
     def optuna_objective(metrics):
         return metrics['eval_roc_auc_macro']
 
-    m = args.model_name_or_path.split("/")[-1]
-    study_name = f'{m}_LORARank-{args.lora_rank}'
-    storage_name = "sqlite:///./Runs/optuna/peft_optuna_v2.db"
+    # set study name based on peft_type 
+    if args.peft_method == "LORA":
+        
+        m = args.model_name_or_path.split("/")[-1]
+        study_name = f'{m}_LORARank-{args.lora_rank}'
+        storage_name = "sqlite:///./Runs/optuna/peft_optuna_v2.db"
+    elif args.peft_method == "IA3":
+        m = args.model_name_or_path.split("/")[-1]
+        study_name = f'{m}_IA3'
+        storage_name = "sqlite:////mnt/sdd/efficient_ml_data/optuna_dbs/Runs/peft_optuna_v2.db"
+    else:
+        raise NotImplementedError(f"Optuna not implemented for {args.peft_method} yet")
     
     # pruner = optuna.pruners.MedianPruner(
     #                     n_startup_trials=10, 
     #                     n_warmup_steps=5)
-
-    trainer.model_init = optuna_model_init
+    
+    # setup uptuna based on IA3 or LoRA
+    if args.peft_method == "LORA":
+        trainer.model_init = optuna_model_init_lora
+    elif args.peft_method == "IA3":
+        trainer.model_init = optuna_model_init_ia3        
     trainer.hyperparameter_search(
                                 direction="maximize",
                                 backend="optuna",
@@ -913,7 +946,8 @@ def main() -> None:
         tokenizer = AutoTokenizer.from_pretrained(**tokenizer_args)   
 
     if getattr(tokenizer, "pad_token_id") is None:
-        tokenizer.pad_token_id = tokenizer.eos_token_id
+        loguru_logger.info(f"Adding pad token manually! Setting pad token to eos token: {tokenizer.eos_token_id}")
+        tokenizer.pad_token_id = tokenizer.eos_token_id        
         
     if task_type == "SEQ_CLS":
         def collate_fn(examples):
@@ -1028,6 +1062,11 @@ def main() -> None:
         model_args.update(dict(torch_dtype=torch.float16, 
                             load_in_8bit=True, 
                             device_map="auto"))
+    
+    # need to load in fp16 for llama models anyway
+    elif "falcon" in model_name_or_path or "llama" in model_name_or_path:
+        model_args.update(dict(torch_dtype=torch.float16,                            
+                            device_map="auto"))  
         
     if task_type == "SEQ_CLS":
         loguru_logger.info("Using sequence classification")
@@ -1037,9 +1076,12 @@ def main() -> None:
         model = AutoModelForTokenClassification.from_pretrained(**model_args)
     
     # falcon model seems to use model config to define pad token and the remote code panicks if you don't set it
-    if "falcon" in model_name_or_path:
+    if "falcon" in model_name_or_path or "llama" in model_name_or_path:
+        loguru_logger.info("Setting pad token manually for falcon/llama model in the model config")
         model.config.use_cache = False
-        model.config.pad_token_id = tokenizer.pad_token_id
+        model.config.pad_token_id = tokenizer.eos_token_id
+
+        fp16_flag = True
     
     # need to now prepare the 8bit models
     if args.eight_bit_training:
@@ -1147,6 +1189,7 @@ def main() -> None:
         # warmup_ratio = 0.06,
         warmup_steps = 0.06 * (len(tokenized_datasets['train'])/train_batch_size * min(num_epochs, 5)),
         learning_rate = lr,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
 
         # use_ipex = args.use_ipex # for cpu only
         # remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
