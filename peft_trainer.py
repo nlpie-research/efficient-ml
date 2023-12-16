@@ -790,8 +790,8 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
 
 def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
     
-    if args.peft_method != "LORA":
-        loguru_logger.info("Optuna only implemented for LORA at the moment. Exiting.")
+    if not (args.peft_method == "LORA" or args.peft_method == "IA3"):
+        loguru_logger.info(f"Optuna only implemented for LORA or IA3 at the moment. But got:{args.peft_method} Exiting.")
         return
 
     def optuna_hp_space(trial):
@@ -799,7 +799,8 @@ def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
             'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True)
         }
 
-    def optuna_model_init(trial):
+    def optuna_model_init_lora(trial):
+        assert args.peft_method == "LORA", "Optuna only implemented for LORA at the moment. Exiting."
         # Set the parameter space anyway to avoid issues while saving/loading
         lora_rank = trial.suggest_categorical('lora_rank', [args.lora_rank])
         lora_alpha = lora_rank * trial.suggest_categorical('lora_alpha', [0.3, 0.5, 1.0])
@@ -819,19 +820,47 @@ def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
         model_copy = copy.deepcopy(model)
         peft_model = get_peft_model(model_copy, peft_config)
         return peft_model
+    
+    def optuna_model_init_ia3(trial):
+        assert args.peft_method == "IA3", "Optuna only implemented for IA3 at the moment. Exiting."
+        
+        args.learning_rate = trial.params['learning_rate']
+        
+        peft_config, _ = create_peft_config(args=args,
+                                            peft_method=args.peft_method,
+                                            model_name_or_path=args.model_name_or_path,
+                                            task_type=args.task_type)
+        loguru_logger.info(f"Optuna params are: {trial.params}")
+        
+        model_copy = copy.deepcopy(model)
+        peft_model = get_peft_model(model_copy, peft_config)
+        return peft_model
         
     def optuna_objective(metrics):
         return metrics['eval_roc_auc_macro']
 
-    m = args.model_name_or_path.split("/")[-1]
-    study_name = f'{m}_LORARank-{args.lora_rank}'
-    storage_name = "sqlite:///./Runs/optuna/peft_optuna_v2.db"
+    # set study name based on peft_type 
+    if args.peft_method == "LORA":
+        
+        m = args.model_name_or_path.split("/")[-1]
+        study_name = f'{m}_LORARank-{args.lora_rank}'
+        storage_name = "sqlite:///./Runs/optuna/peft_optuna_v2.db"
+    elif args.peft_method == "IA3":
+        m = args.model_name_or_path.split("/")[-1]
+        study_name = f'{m}_IA3'
+        storage_name = "sqlite:////mnt/sdd/efficient_ml_data/optuna_dbs/Runs/peft_optuna_v2.db"
+    else:
+        raise NotImplementedError(f"Optuna not implemented for {args.peft_method} yet")
     
     # pruner = optuna.pruners.MedianPruner(
     #                     n_startup_trials=10, 
     #                     n_warmup_steps=5)
-
-    trainer.model_init = optuna_model_init
+    
+    # setup uptuna based on IA3 or LoRA
+    if args.peft_method == "LORA":
+        trainer.model_init = optuna_model_init_lora
+    elif args.peft_method == "IA3":
+        trainer.model_init = optuna_model_init_ia3        
     trainer.hyperparameter_search(
                                 direction="maximize",
                                 backend="optuna",
