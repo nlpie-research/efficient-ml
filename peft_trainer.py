@@ -1081,7 +1081,7 @@ def main() -> None:
         model.config.use_cache = False
         model.config.pad_token_id = tokenizer.eos_token_id
 
-        fp16_flag = True
+        # fp16_flag = True
     
     # need to now prepare the 8bit models
     if args.eight_bit_training:
