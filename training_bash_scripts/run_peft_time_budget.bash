@@ -22,19 +22,19 @@ do
             python peft_trainer.py \
                 --model_name_or_path "$model" \
                 --max_epochs "$max_epochs" \
-                --evaluation_strategy "epoch" \
+                --evaluation_strategy "steps" \
                 --eval_every_steps 200 \
                 --task "$task" \
                 --peft_method "$peft_method" \
                 --log_save_dir $log_save_dir \
                 --ckpt_save_dir $ckpt_save_dir \
-                --train_batch_size 4 \
-                --eval_batch_size 4 \
-                --eight_bit_training \
+                --train_batch_size 2 \
+                --eval_batch_size 2 \
                 --learning_rate 0.00005 \
                 --lora_rank 16 \
                 --lora_alpha 32 \
-                --time_budget $tb
+                --time_budget $tb \
+                --gradient_accumulation_steps 8
 
         else
             # Load best LORA params for model type
@@ -54,7 +54,7 @@ do
             python peft_trainer.py \
                 --model_name_or_path "$model" \
                 --max_epochs "$max_epochs" \
-                --evaluation_strategy "epoch" \
+                --evaluation_strategy "steps" \
                 --eval_every_steps 200 \
                 --task "$task" \
                 --peft_method $peft_method \
