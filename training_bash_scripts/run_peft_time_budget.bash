@@ -1,14 +1,14 @@
-# model_name_or_path=(nlpie/bio-mobilebert
-#                     nlpie/tiny-biobert
-#                     nlpie/distil-biobert
-#                     dmis-lab/biobert-v1.1
-#                     )
-model_name_or_path=(meta-llama/Llama-2-7b-hf)
+model_name_or_path=(nlpie/bio-mobilebert
+                    nlpie/tiny-biobert
+                    nlpie/distil-biobert
+                    dmis-lab/biobert-v1.1
+                    )
+# model_name_or_path=(meta-llama/Llama-2-7b-hf)
 peft_method=LORA
 task=mimic-mp
 max_epochs=10000
-time_budget=(6000)
-gpu=0
+time_budget=(2000)
+gpu=1
 for tb in "${time_budget[@]}"
 do
     log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/tb_${tb}/logs
