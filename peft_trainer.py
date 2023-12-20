@@ -29,6 +29,9 @@ from peft import (
     set_peft_model_state_dict,
 )
 from scipy.special import softmax
+
+# from torchmetrics import AUROC # cuda issues
+from sklearn.metrics import roc_auc_score
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from torchmetrics import AUROC
@@ -271,10 +274,6 @@ def parse_args() -> argparse.Namespace:
                             "Number of epochs with no improvement "
                             "after which training will be stopped."
                         ))
-    parser.add_argument('--fast_dev_run',
-                        default=False,
-                        type=bool,
-                        help='Run for a trivial single batch and single epoch.')
     parser.add_argument('--save_adapter',
                         action = "store_true",
                         help='Whether or not to save the trained adapter weights')
@@ -458,6 +457,42 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
     
     # get number of labels
     num_labels = len(np.unique(datasets["train"][args.label_name]))
+
+    # add few shot sampling here too
+    if few_shot_n is not None:
+        loguru_logger.info(f"Sampling {few_shot_n} samples per class")
+        train_datasets = []
+        for label in range(num_labels):
+            label_dataset = datasets['train'].filter(lambda x: x[args.label_name] == label).shuffle(seed=42)
+            num_samples = len(label_dataset)
+            # if we have more samples than the few shot n - then we need to sample
+            if num_samples >= few_shot_n:
+
+                # select num_samples_per_class samples from the label
+                label_dataset = label_dataset.select(range(few_shot_n))
+            
+            # add to list of datasets
+            train_datasets.append(label_dataset)
+
+        datasets["train"] = concatenate_datasets(train_datasets)
+    # same for validation
+    if args.eval_few_shot_n is not None:
+        loguru_logger.info(f"Sampling {args.eval_few_shot_n} samples per class")
+        eval_datasets = []
+        for label in range(num_labels):
+            label_dataset = datasets['validation'].filter(lambda x: x[args.label_name] == label).shuffle(seed=42)
+            num_samples = len(label_dataset)
+            # if we have more samples than the few shot n - then we need to sample
+            if num_samples >= args.eval_few_shot_n:
+
+                # select num_samples_per_class samples from the label
+                label_dataset = label_dataset.select(range(args.eval_few_shot_n))
+            
+            # add to list of datasets
+            eval_datasets.append(label_dataset)
+
+        datasets["validation"] = concatenate_datasets(eval_datasets)
+
     loguru_logger.info(f"Number of labels is: {num_labels}")
     
     print(f"tokenizer is: {tokenizer}")
@@ -486,23 +521,59 @@ def load_datasets(args:argparse.Namespace, info:DatasetInfo, tokenizer:AutoToken
     loguru_logger.info(f"Dataset loaded. Dataset info: {dataset}")
 
     if info.type == "classification":
-      num_labels = len(set(dataset["train"]["labels"]))
-      def mappingFunction(samples, **kargs):
-        if info.isMultiSentence:
-          outputs = tokenizer(samples[dataset["train"].column_names[0]],
-                              samples[dataset["train"].column_names[1]],
-                              max_length=args.max_length,
-                              truncation=True,
-                              padding=kargs["padding"])
-        else:
-          outputs = tokenizer(samples[dataset["train"].column_names[0]],
-                              truncation=True,
-                              max_length=args.max_length,
-                              padding=kargs["padding"])
+        num_labels = len(set(dataset["train"]["labels"]))
+      #TODO - add the fewshot sampling here?
+        # if we are doing few shot - we need to sample the training data
+        if args.few_shot_n is not None:
+            loguru_logger.info(f"Sampling {args.few_shot_n} samples per class")
+            train_datasets = []
+            for label in range(num_labels):
+                label_dataset = dataset['train'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
+                num_samples = len(label_dataset)
+                # if we have more samples than the few shot n - then we need to sample
+                if num_samples >= args.few_shot_n:
 
-        outputs["labels"] = samples["labels"]
+                    # select num_samples_per_class samples from the label
+                    label_dataset = label_dataset.select(range(args.few_shot_n))
+                
+                # add to list of datasets
+                train_datasets.append(label_dataset)
 
-        return outputs
+            dataset["train"] = concatenate_datasets(train_datasets)
+        # also for eval set using the args.eval_few_shot_n
+        if args.eval_few_shot_n is not None:
+            loguru_logger.info(f"Sampling {args.eval_few_shot_n} samples per class")
+            eval_datasets = []
+            for label in range(num_labels):
+                label_dataset = dataset['validation'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
+                num_samples = len(label_dataset)
+                # if we have more samples than the few shot n - then we need to sample
+                if num_samples >= args.eval_few_shot_n:
+
+                    # select num_samples_per_class samples from the label
+                    label_dataset = label_dataset.select(range(args.eval_few_shot_n))
+                
+                # add to list of datasets
+                eval_datasets.append(label_dataset)
+
+            dataset["validation"] = concatenate_datasets(eval_datasets)
+
+        def mappingFunction(samples, **kargs):
+            if info.isMultiSentence:
+                outputs = tokenizer(samples[dataset["train"].column_names[0]],
+                                    samples[dataset["train"].column_names[1]],
+                                    max_length=args.max_length,
+                                    truncation=True,
+                                    padding=kargs["padding"])
+            else:
+                outputs = tokenizer(samples[dataset["train"].column_names[0]],
+                                    truncation=True,
+                                    max_length=args.max_length,
+                                    padding=kargs["padding"])
+
+            outputs["labels"] = samples["labels"]
+
+            return outputs
     elif info.type == "ner":
       # print(dataset)
       num_labels = len(dataset["info"][0]["all_ner_tags"])
@@ -630,11 +701,12 @@ def compute_seq_cls_metrics(eval_pred):
           
 
     logits, labels = eval_pred    
+    print(f"logits are: {logits} of shape: {logits.shape}")
     # print(f"logits shape is: {logits.shape}")
     pred_scores = softmax(logits, axis = -1)        
     predictions = np.argmax(logits, axis = -1)
     
-    # print(f"logits are: {logits} of shape: {logits.shape}")
+    
     # check if pred_scores sum to 1
             
     # print(f"Labels are: {labels}\n")
@@ -647,14 +719,14 @@ def compute_seq_cls_metrics(eval_pred):
     # compute roc_auc using torchmetrics
 
     
-    if logits.shape[1] == 1 or logits.shape[1] == 2:
-        auroc = AUROC(task = "binary")
-        roc_auc = auroc(torch.tensor((pred_scores[:,1])), torch.tensor(labels))
-    else:
-        auroc = AUROC(task = "multiclass", num_classes = logits.shape[1])
-        roc_auc = auroc(torch.tensor((pred_scores)), torch.tensor(labels))
+    # if logits.shape[1] == 1 or logits.shape[1] == 2:
+    #     auroc = AUROC(task = "binary")
+    #     roc_auc = auroc(torch.tensor((pred_scores[:,1])), torch.tensor(labels))
+    # else:
+    #     auroc = AUROC(task = "multiclass", num_classes = logits.shape[1])
+    #     roc_auc = auroc(torch.tensor((pred_scores)), torch.tensor(labels))
         
-    
+    # or using evaluate
     # try:
     #     if logits.shape[1] == 1 or logits.shape[1] == 2:
     #         roc_auc_score = evaluate.load("roc_auc", "binary")
@@ -678,13 +750,35 @@ def compute_seq_cls_metrics(eval_pred):
     #         f.write("\n".join([str(l) for l in pred_scores]))
         
     #     # exit here
-    #     exit(0)
+    #     # exit(0)
+    #     # default auroc to 0
+    #     roc_auc = 0.0
+
+    # roc_auc using sklearn
+    try:
+        if logits.shape[1] == 1 or logits.shape[1] == 2:
+            roc_auc = roc_auc_score(labels, pred_scores[:,1])
+        else:
+            roc_auc = roc_auc_score(labels, pred_scores, multi_class = 'ovr', average = "macro")
+    except:
+        with open("./faulty_logits.txt", "w") as f:
+            f.write("\n".join([str(l) for l in logits]))
+        
+        # same for scores
+        with open("./faulty_scores.txt", "w") as f:
+            f.write("\n".join([str(l) for l in pred_scores]))
+        
+        # exit here
+        # exit(0)
+        # # default auroc to 0
+        roc_auc = 0.0
             
         
     # print(f"logits are: {logits} of shape: {logits.shape}")
     
     print(f"Labels are: {labels}\n")
     print(f"Preds are: {predictions}")
+    print(f"Pred scores are: {pred_scores}")
     precision = precision_score.compute(predictions=predictions, references=labels, average = "macro")["precision"]
     recall = recall_score.compute(predictions=predictions, references=labels, average = "macro")["recall"]
     accuracy = accuracy_score.compute(predictions=predictions, references=labels)["accuracy"]
@@ -1039,23 +1133,23 @@ def main() -> None:
     # print number of labels
     loguru_logger.info(f"##### Number of labels is: {num_labels} #####")
     
-    # if we are doing few shot - we need to sample the training data
-    if few_shot_n is not None:
-        loguru_logger.info(f"Sampling {few_shot_n} samples per class")
-        train_datasets = []
-        for label in range(num_labels):
-            label_dataset = tokenized_datasets['train'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
-            num_samples = len(label_dataset)
-            # if we have more samples than the few shot n - then we need to sample
-            if num_samples >= few_shot_n:
+    # # if we are doing few shot - we need to sample the training data
+    # if few_shot_n is not None:
+    #     loguru_logger.info(f"Sampling {few_shot_n} samples per class")
+    #     train_datasets = []
+    #     for label in range(num_labels):
+    #         label_dataset = tokenized_datasets['train'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
+    #         num_samples = len(label_dataset)
+    #         # if we have more samples than the few shot n - then we need to sample
+    #         if num_samples >= few_shot_n:
 
-                # select num_samples_per_class samples from the label
-                label_dataset = label_dataset.select(range(few_shot_n))
+    #             # select num_samples_per_class samples from the label
+    #             label_dataset = label_dataset.select(range(few_shot_n))
             
-            # add to list of datasets
-            train_datasets.append(label_dataset)
+    #         # add to list of datasets
+    #         train_datasets.append(label_dataset)
 
-        tokenized_datasets["train"] = concatenate_datasets(train_datasets)
+    #     tokenized_datasets["train"] = concatenate_datasets(train_datasets)
 
     print(f"Tokenized datasets: {tokenized_datasets}")
     print(f'Sample train data:\n{tokenized_datasets["train"][1]}')
@@ -1091,8 +1185,9 @@ def main() -> None:
     
     # need to load in fp16 for llama models anyway
     elif "falcon" in model_name_or_path or "llama" in model_name_or_path:
-        model_args.update(dict(torch_dtype=torch.float16,                            
+        model_args.update(dict(torch_dtype=torch.bfloat16,                            
                             device_map="auto"))  
+        
         
     if task_type == "SEQ_CLS":
         loguru_logger.info("Using sequence classification")
@@ -1107,7 +1202,8 @@ def main() -> None:
         model.config.use_cache = False
         model.config.pad_token_id = tokenizer.eos_token_id
 
-        fp16_flag = True
+        fp16_flag = False
+        
     
     # need to now prepare the 8bit models
     if args.eight_bit_training:
@@ -1189,7 +1285,7 @@ def main() -> None:
     #     num_warmup_steps=0.06 * (len(tokenized_datasets['train'])/train_batch_size * num_epochs),
     #     num_training_steps=(len(tokenized_datasets['train'])/train_batch_size * num_epochs),
     # )
-
+    loguru_logger.warning(f"!!!!!!!!!!Prior to training fp16 flag is: {fp16_flag}!!!!!!!!!!!")
     train_args = TrainingArguments(
         output_dir = f"{ckpt_dir}/",
         evaluation_strategy = args.evaluation_strategy,
