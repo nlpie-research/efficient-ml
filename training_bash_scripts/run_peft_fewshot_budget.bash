@@ -5,8 +5,8 @@ model_name_or_path=(nlpie/bio-mobilebert
                     )
 peft_method=Full
 task=mimic-mp
-max_epochs=5
-few_shot_n=(16 32 64 128)
+max_epochs=10
+few_shot_n=(16 32 64 128 256 512 1024)
 gpu=0
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/fewshot_budget/logs
 ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/fewshot_budget/ckpts
@@ -56,7 +56,6 @@ do
             --ckpt_save_dir $ckpt_save_dir \
             --few_shot_n $few_shot \
             --saving_strategy epoch
-
 
     done
 done
