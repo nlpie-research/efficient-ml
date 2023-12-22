@@ -1157,6 +1157,7 @@ def main() -> None:
     
     # need to load in fp16 for llama models anyway
     elif "falcon" in model_name_or_path or "llama" in model_name_or_path:
+        loguru_logger.warning(f"Llama model found - setting to bfloat16")
         model_args.update(dict(torch_dtype=torch.bfloat16,                            
                             device_map="auto"))  
         
@@ -1279,7 +1280,7 @@ def main() -> None:
         overwrite_output_dir=True,
         fp16 = fp16_flag,
         no_cuda = args.no_cuda, # for cpu only
-        lr_scheduler_type = 'constant_with_warmup' if time_budget != -1 else 'linear',
+        lr_scheduler_type = 'constant' if time_budget != -1 else 'linear',
         warmup_steps = 0.06 * (len(tokenized_datasets['train'])/train_batch_size * min(num_epochs, 5)),
         learning_rate = lr,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
