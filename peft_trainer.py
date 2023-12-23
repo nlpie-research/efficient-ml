@@ -1185,6 +1185,7 @@ def main() -> None:
     
     # need to load in fp16 for llama models anyway
     elif "falcon" in model_name_or_path or "llama" in model_name_or_path:
+        loguru_logger.warning(f"Llama model found - setting to bfloat16")
         model_args.update(dict(torch_dtype=torch.bfloat16,                            
                             device_map="auto"))  
         
