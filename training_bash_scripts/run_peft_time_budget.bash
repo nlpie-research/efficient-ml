@@ -1,9 +1,10 @@
-model_name_or_path=(nlpie/bio-mobilebert
-                    nlpie/tiny-biobert
-                    nlpie/distil-biobert
-                    dmis-lab/biobert-v1.1
-                    )
+# model_name_or_path=(nlpie/bio-mobilebert
+#                     nlpie/tiny-biobert
+#                     nlpie/distil-biobert
+#                     dmis-lab/biobert-v1.1
+#                     )
 # model_name_or_path=(meta-llama/Llama-2-7b-hf)
+model_name_or_path=(nlpie/distil-biobert)
 peft_method=Full
 task=mimic-mp
 max_epochs=10000
