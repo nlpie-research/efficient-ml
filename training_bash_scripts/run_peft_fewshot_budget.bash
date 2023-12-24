@@ -2,11 +2,12 @@ model_name_or_path=(nlpie/bio-mobilebert
                     nlpie/tiny-biobert
                     nlpie/distil-biobert
                     dmis-lab/biobert-v1.1
+                    roberta-base
                     )
 peft_methods=(LORA Full)
 task=mimic-mp
 max_epochs=10
-few_shot_n=(2048 4096)
+few_shot_n=(16 32 64 128 256 512 1024 2048 4096)
 gpu=2
 log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/fewshot_budget/logs
 ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/fewshot_budget/ckpts
@@ -36,31 +37,31 @@ do
                 python peft_trainer.py \
                     --model_name_or_path "$model" \
                     --max_epochs "$max_epochs" \
-                    --evaluation_strategy "epoch" \
-                    --eval_every_steps 200 \
+                    --evaluation_strategy epoch \
+                    --saving_strategy epoch \
+                    --scheduler_type constant \
                     --task "$task" \
                     --peft_method $peft_method \
                     --log_save_dir $log_save_dir \
                     --ckpt_save_dir $ckpt_save_dir \
+                    --few_shot_n $few_shot \
                     --lora_rank $lora_rank \
                     --lora_alpha $lora_alpha \
                     --lora_dropout $lora_dropout \
-                    --learning_rate $learning_rate \
-                    --few_shot_n $few_shot \
-                    --saving_strategy epoch
-            
+                    --learning_rate $learning_rate
+                    
             else
                 python peft_trainer.py \
                     --model_name_or_path "$model" \
                     --max_epochs "$max_epochs" \
-                    --evaluation_strategy "epoch" \
-                    --eval_every_steps 200 \
+                    --evaluation_strategy epoch \
+                    --saving_strategy epoch \
+                    --scheduler_type constant \
                     --task "$task" \
                     --peft_method $peft_method \
                     --log_save_dir $log_save_dir \
                     --ckpt_save_dir $ckpt_save_dir \
-                    --few_shot_n $few_shot \
-                    --saving_strategy epoch
+                    --few_shot_n $few_shot
             fi
         done
     done
