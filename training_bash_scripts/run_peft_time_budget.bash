@@ -1,12 +1,11 @@
-# model_name_or_path=(
-                    # nlpie/bio-mobilebert
+# model_name_or_path=(nlpie/bio-mobilebert
 #                     nlpie/tiny-biobert
 #                     nlpie/distil-biobert
 #                     dmis-lab/biobert-v1.1
-#                       meta-llama/Llama-2-7b-hf
 #                     )
-model_name_or_path=(roberta-base)
-peft_method=LORA
+# model_name_or_path=(meta-llama/Llama-2-7b-hf)
+model_name_or_path=(nlpie/distil-biobert)
+peft_method=Full
 task=mimic-mp
 max_epochs=10000
 time_budget=(6000) # 12 hours = 43200 seconds 
@@ -65,11 +64,22 @@ do
                 --peft_method $peft_method \
                 --log_save_dir $log_save_dir \
                 --ckpt_save_dir $ckpt_save_dir \
-                --time_budget $tb \
-                --lora_rank $lora_rank \
-                --lora_alpha $lora_alpha \
-                --lora_dropout $lora_dropout \
-                --learning_rate $learning_rate
+                --time_budget $tb
+
+            # python peft_trainer.py \
+            #     --model_name_or_path "$model" \
+            #     --max_epochs "$max_epochs" \
+            #     --evaluation_strategy "steps" \
+            #     --eval_every_steps 200 \
+            #     --task "$task" \
+            #     --peft_method $peft_method \
+            #     --log_save_dir $log_save_dir \
+            #     --ckpt_save_dir $ckpt_save_dir \
+            #     --time_budget $tb \
+            #     --lora_rank $lora_rank \
+            #     --lora_alpha $lora_alpha \
+            #     --lora_dropout $lora_dropout \
+            #     --learning_rate $learning_rate
         fi  
         
     done

@@ -1,6 +1,65 @@
-import sys
+import argparse
+import copy
+import json
 import os
+import sys
+import traceback
+from datetime import datetime
 from functools import partial
+
+import evaluate
+import numpy as np
+import optuna
+import torch
+import yaml
+from datasets import DatasetDict, concatenate_datasets, load_dataset, load_from_disk
+from loguru import logger as loguru_logger
+from peft import (
+    IA3Config,
+    LoraConfig,
+    PeftType,
+    PrefixTuningConfig,
+    PromptEncoderConfig,
+    PromptTuningConfig,
+    TaskType,
+    get_peft_config,
+    get_peft_model,
+    get_peft_model_state_dict,
+    prepare_model_for_kbit_training,
+    set_peft_model_state_dict,
+)
+from scipy.special import softmax
+
+# from torchmetrics import AUROC # cuda issues
+from sklearn.metrics import roc_auc_score
+from torch.optim import AdamW
+from torch.utils.data import DataLoader
+from torchmetrics import AUROC
+from tqdm import tqdm
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoModelForTokenClassification,
+    AutoTokenizer,
+    DataCollatorForTokenClassification,
+    EarlyStoppingCallback,
+    LlamaForSequenceClassification,
+    LlamaTokenizer,
+    Trainer,
+    TrainerCallback,
+    TrainerControl,
+    TrainerState,
+    TrainingArguments,
+    get_constant_schedule,
+    get_linear_schedule_with_warmup,
+    set_seed,
+)
+
+from data_utils.model_utils import (
+    count_trainable_parameters,
+    freeze_model,
+    unfreeze_model,
+)
+
 # print cuda_visible_devices 
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -9,38 +68,7 @@ from functools import partial
 # 2080s = 0,3,5,6,8 
 # When specifiying from the command line, Nvidia-smi ids: 0, 3, 5, 6, 8 Actual id: 5,6,7,8,9 
 
-import argparse
-import json
-from datetime import datetime
-import traceback
-import optuna
 
-import copy
-import evaluate
-import numpy as np
-import torch
-# from torchmetrics import AUROC # cuda issues
-from sklearn.metrics import roc_auc_score
-import yaml
-from datasets import load_dataset, load_from_disk, concatenate_datasets, DatasetDict
-from loguru import logger as loguru_logger
-from peft import (LoraConfig,IA3Config, PeftType, PrefixTuningConfig,
-                  PromptEncoderConfig, PromptTuningConfig, TaskType,
-                  get_peft_config, get_peft_model, get_peft_model_state_dict,
-                  prepare_model_for_kbit_training, set_peft_model_state_dict)
-from scipy.special import softmax
-from torch.optim import AdamW
-from torch.utils.data import DataLoader
-from tqdm import tqdm
-from transformers import (AutoModelForSequenceClassification,
-                          AutoModelForTokenClassification, AutoTokenizer,
-                          DataCollatorForTokenClassification,
-                          LlamaForSequenceClassification, LlamaTokenizer,
-                          Trainer, TrainerControl, TrainerState, TrainingArguments,
-                          get_linear_schedule_with_warmup, 
-                          get_constant_schedule, set_seed, TrainerCallback, 
-                          EarlyStoppingCallback)
-from data_utils.model_utils import count_trainable_parameters, unfreeze_model, freeze_model
 
 
 
@@ -254,6 +282,10 @@ def parse_args() -> argparse.Namespace:
                         default="adamw",
                         type=str,
                         help="Optimization algorithm to use e.g. adamw, adafactor")
+    parser.add_argument("--scheduler_type",
+                        default="linear",
+                        type=str,
+                        help="Scheduler to use e.g. linear, constant, cosine, exponential")
 
     parser.add_argument("--peft_method",
                         default="LORA", # LORA, PREFIX_TUNING, PROMPT_TUNING, P_TUNING
@@ -1281,7 +1313,7 @@ def main() -> None:
         overwrite_output_dir=True,
         fp16 = fp16_flag,
         no_cuda = args.no_cuda, # for cpu only
-        lr_scheduler_type = 'constant' if time_budget != -1 else 'linear',
+        lr_scheduler_type = args.scheduler_type,
         warmup_steps = 0.06 * (len(tokenized_datasets['train'])/train_batch_size * min(num_epochs, 5)),
         learning_rate = lr,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
