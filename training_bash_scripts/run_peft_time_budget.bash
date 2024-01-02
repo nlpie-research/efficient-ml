@@ -1,13 +1,15 @@
-model_name_or_path=(nlpie/bio-mobilebert
-                    nlpie/tiny-biobert
-                    nlpie/distil-biobert
-                    dmis-lab/biobert-v1.1
-                    )
-# model_name_or_path=(meta-llama/Llama-2-7b-hf)
+# model_name_or_path=(
+                    # nlpie/bio-mobilebert
+#                     nlpie/tiny-biobert
+#                     nlpie/distil-biobert
+#                     dmis-lab/biobert-v1.1
+#                       meta-llama/Llama-2-7b-hf
+#                     )
+model_name_or_path=(roberta-base)
 peft_method=LORA
 task=mimic-mp
 max_epochs=10000
-time_budget=(2000)
+time_budget=(6000) # 12 hours = 43200 seconds 
 gpu=1
 for tb in "${time_budget[@]}"
 do
@@ -28,13 +30,16 @@ do
                 --peft_method "$peft_method" \
                 --log_save_dir $log_save_dir \
                 --ckpt_save_dir $ckpt_save_dir \
-                --train_batch_size 2 \
-                --eval_batch_size 2 \
+                --train_batch_size 1 \
+                --eval_batch_size 1 \
                 --learning_rate 0.00005 \
                 --lora_rank 16 \
                 --lora_alpha 32 \
                 --time_budget $tb \
-                --gradient_accumulation_steps 8
+                --gradient_accumulation_steps 16
+                # --few_shot_n 10 \
+                # --eval_few_shot_n 10
+                # --eight_bit_training
 
         else
             # Load best LORA params for model type
