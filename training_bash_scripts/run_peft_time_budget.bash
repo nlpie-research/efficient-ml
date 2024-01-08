@@ -3,13 +3,13 @@
 #                     nlpie/distil-biobert
 #                     dmis-lab/biobert-v1.1
 #                     )
-# model_name_or_path=(meta-llama/Llama-2-7b-hf)
-model_name_or_path=(nlpie/distil-biobert)
-peft_method=Full
+model_name_or_path=(meta-llama/Llama-2-7b-hf)
+# model_name_or_path=(nlpie/distil-biobert)
+peft_method=LORA
 task=mimic-mp
 max_epochs=10000
-time_budget=(6000) # 12 hours = 43200 seconds 
-gpu=1
+time_budget=(43200) # 12 hours = 43200 seconds 
+gpu=0
 for tb in "${time_budget[@]}"
 do
     log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/tb_${tb}/logs
@@ -35,7 +35,9 @@ do
                 --lora_rank 16 \
                 --lora_alpha 32 \
                 --time_budget $tb \
+                --scheduler_type constant \
                 --gradient_accumulation_steps 16
+                # --eight_bit_training
                 # --few_shot_n 10 \
                 # --eval_few_shot_n 10
                 # --eight_bit_training
