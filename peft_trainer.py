@@ -34,7 +34,6 @@ from scipy.special import softmax
 from sklearn.metrics import roc_auc_score
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
-from torchmetrics import AUROC
 from tqdm import tqdm
 from transformers import (
     AutoModelForSequenceClassification,
@@ -203,7 +202,7 @@ def parse_args() -> argparse.Namespace:
                         type=int,
                         help = "How many steps of training before an evaluation is run on the validation set")
     parser.add_argument("--log_every_steps",
-                        default = 10,
+                        default = 50,
                         type=int,
                         help = "How often are we logging?")
     parser.add_argument("--train_batch_size",
@@ -311,7 +310,7 @@ def parse_args() -> argparse.Namespace:
                         default = None)
     parser.add_argument("--eval_few_shot_n",
                         type=int,
-                        default = 128)
+                        default = None)
     parser.add_argument("--optuna",
                         action = "store_true",
                         help='Whether or not to use optuna to tune hyperparameters')
@@ -827,13 +826,18 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
                 ]
             )
             lr = args.learning_rate
-        elif "mobile" in model_name_or_path.lower():
+        elif "mobile" in model_name_or_path.lower() or "tiny" in model_name_or_path.lower():
             loguru_logger.info("Using mobile config")
             peft_type = PeftType.LORA
             lr = args.learning_rate # default 3e-4
             peft_config = LoraConfig(task_type=task_type, target_modules=["query", "key", "value"], inference_mode=False, 
                                     r=args.lora_rank, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout)
-            
+        elif "distilbert" in model_name_or_path.lower():
+            loguru_logger.info("Using base distilbert config")
+            peft_type = PeftType.LORA
+            lr = args.learning_rate
+            peft_config = LoraConfig(task_type=task_type, target_modules=["q_lin","k_lin", "v_lin"], inference_mode=False, 
+                                    r=args.lora_rank, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout)
         elif "longformer" in model_name_or_path.lower():
             loguru_logger.info("Using longformer config")
             peft_type = PeftType.LORA
