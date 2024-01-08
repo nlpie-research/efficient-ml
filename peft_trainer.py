@@ -384,7 +384,7 @@ def get_model_name(model_name_or_path:str) -> str:
                 if "span_comparison" in model_name_or_path:
                     model_name = model_name_or_path.split("/")[9] + "/declutr/" + model_name_or_path.split("/")[-3]
                 else:
-                    model_name = model_name_or_path.split("/")[8] + "/declutr/" + model_name_or_path.split("/")[-3]
+                    model_name = model_name_or_path.split("/")[8] + "_declutr_" + model_name_or_path.split("/")[-3]
 
             else:
                 model_name = model_name_or_path.split("/")[7] + "/declutr/" + model_name_or_path.split("/")[-3]
@@ -1026,6 +1026,7 @@ def main() -> None:
     # THIS IS ALL VERY CRUDE AND DEPENDENT ON HAVING TRAINED USING THE SCRIPTS INSIDE THIS REPO - 
     # forward slashes really matter for the naming convention make sure to append the path with a forward slash
     model_name = get_model_name(model_name_or_path)
+    loguru_logger.info(f"######### Model name is: {model_name}######################")
     
     # save to the args
     args.custom_model_name = model_name
