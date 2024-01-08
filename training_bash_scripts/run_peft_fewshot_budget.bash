@@ -8,9 +8,9 @@ peft_methods=(LORA Full)
 task=mimic-mp
 max_epochs=10
 few_shot_n=(16 32 64 128 256 512 1024 2048 4096)
-gpu=2
-log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/fewshot_budget/logs
-ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/fewshot_budget/ckpts
+gpu=3
+log_save_dir=/mnt/sdh/effecient_ml/fewshot_budget/logs
+ckpt_save_dir=/mnt/sdh/effecient_ml/fewshot_budget/ckpts
 for few_shot in "${few_shot_n[@]}"
 do
     for model in "${model_name_or_path[@]}"
