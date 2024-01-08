@@ -311,7 +311,7 @@ def parse_args() -> argparse.Namespace:
                         default = None)
     parser.add_argument("--eval_few_shot_n",
                         type=int,
-                        default = 128)
+                        default = None)
     parser.add_argument("--optuna",
                         action = "store_true",
                         help='Whether or not to use optuna to tune hyperparameters')
