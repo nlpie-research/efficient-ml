@@ -860,8 +860,17 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
     elif peft_method == "PREFIX_TUNING":
         loguru_logger.info("Using PREFIX_TUNING")
         peft_type = PeftType.PREFIX_TUNING
-        peft_config = PrefixTuningConfig(task_type=task_type, 
-                                         num_virtual_tokens=args.num_virtual_tokens)
+        if "distilbert" in model_name_or_path:
+            peft_config = PrefixTuningConfig(task_type="SEQ_CLS",
+                                    num_virtual_tokens=20,
+                                    num_layers = 6,
+                                    num_attention_heads = 12,
+                                    token_dim = 768)
+        
+        else:
+            
+            peft_config = PrefixTuningConfig(task_type=task_type, 
+                                            num_virtual_tokens=args.num_virtual_tokens)
         lr = args.learning_rate # default 1e-2
     elif peft_method == "PROMPT_TUNING":
         loguru_logger.info("Using PROMPT_TUNING")
@@ -886,10 +895,10 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
         lr = args.learning_rate # default 1e-3
         
     elif peft_method == "IA3":
+        peft_type = PeftType.IA3
         #TODO refactor any handling of target_modules to be done in the config
         # need to handle specific model types having different target_modules
-        if "mobile" in model_name_or_path:
-            peft_type = PeftType.IA3
+        if "mobile" in model_name_or_path:            
             peft_config = IA3Config(task_type=task_type,
                                     target_modules=["key",
                                                     "value",
@@ -897,8 +906,7 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
                                                     ], 
                                     feedforward_modules=['output.dense'], 
                                     inference_mode=False)
-        elif "longformer" in model_name_or_path:            
-            peft_type = PeftType.IA3
+        elif "longformer" in model_name_or_path:           
             peft_config = IA3Config(task_type=task_type,
                                     target_modules=["query","value","key", 
                                                          "query_global", 
@@ -907,9 +915,12 @@ def create_peft_config(args:argparse.Namespace,peft_method:str, model_name_or_pa
                                                          "output.dense"],                                                   
                                     feedforward_modules=['output.dense'], 
                                     inference_mode=False)
-        
-        else:
-            peft_type = PeftType.IA3
+        elif "distilbert" in model_name_or_path:            
+            peft_config = IA3Config(task_type="SEQ_CLS", 
+                        target_modules=["k_lin", "v_lin","lin1", "lin2"], 
+                        feedforward_modules=["lin1","lin2"],
+                        inference_mode=False)        
+        else:            
             peft_config = IA3Config(task_type=task_type, inference_mode=False)
         
         lr = args.learning_rate # default 1e-3
