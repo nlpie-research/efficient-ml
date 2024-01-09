@@ -13,7 +13,7 @@ from transformers import (AutoModelForSequenceClassification,
                           LlamaForSequenceClassification, LlamaTokenizer,
                           Trainer, TrainingArguments,
                           get_linear_schedule_with_warmup, set_seed)
-from model_utils import count_trainable_parameters
+from model_utils import count_trainable_parameters, get_model_size, get_full_model_size
 import pandas as pd
 from tqdm import tqdm
 # import sys and append path
@@ -99,6 +99,10 @@ def get_number_of_trainable_params(args:argparse.Namespace,
         # count total trainable params before peft
         total_params = count_trainable_parameters(model)
         
+        # get model size and full model size too
+        model_size_MB, model_size_GB = get_model_size(model)
+        full_model_size_MB, full_model_size_GB = get_full_model_size(model)
+        
         for peft_method in tqdm(peft_types, desc=f"model type: {model_name_or_path}"):
             
             try:
@@ -131,17 +135,48 @@ def get_number_of_trainable_params(args:argparse.Namespace,
                 # proportion of total trainable params
                 n_peft_params_perc = (n_peft_params / total_params) * 100
                 
+                # get size of peft adapter only
+                peft_model_size_MB, peft_model_size_GB = get_model_size(peft_model)
+                peft_full_model_size_MB, peft_full_model_size_GB = get_full_model_size(peft_model)
+                
+                # store the model name, peft method and number of trainable params
+                # model_dict[peft_method] = {"n_peft_params": n_peft_params,
+                #                     "total_params": total_params,
+                #                     "n_peft_params_perc": n_peft_params_perc}
+                
                 # store the model name, peft method and number of trainable params
                 model_dict[peft_method] = {"n_peft_params": n_peft_params,
                                     "total_params": total_params,
-                                    "n_peft_params_perc": n_peft_params_perc}
+                                    "n_peft_params_perc": n_peft_params_perc,
+                                    "n_trainable_params": n_trainable_params,                             
+                                    
+                                    "model_size_MB": model_size_MB,
+                                    "model_size_GB": model_size_GB,
+                                    "full_model_size_MB": full_model_size_MB,
+                                    "full_model_size_GB": full_model_size_GB,
+                                    "peft_model_size_MB": peft_model_size_MB,
+                                    "peft_model_size_GB": peft_model_size_GB,
+                                    "peft_full_model_size_MB": peft_full_model_size_MB,
+                                    "peft_full_model_size_GB": peft_full_model_size_GB,}
                 
             except Exception as e:
                 print(f"Error for {model_name_or_path} and {peft_method}")
                 print(e)
                 model_dict[peft_method] = {"n_peft_params": None,
                                     "total_params": None,
-                                    "n_peft_params_perc": None}
+                                    "n_peft_params_perc": None,
+                                    "n_trainable_params": None,
+                                    "total_trainable_params": None,
+                                    
+                                    "model_size_MB": None,
+                                    "model_size_GB": None,
+                                    "full_model_size_MB": None,
+                                    "full_model_size_GB": None,
+                                    "peft_model_size_MB": None,
+                                    "peft_model_size_GB": None,
+                                    "peft_full_model_size_MB": None,
+                                    "peft_full_model_size_GB": None,}
+                
                 
             
         model_peft_dict[model_name_or_path] = model_dict
@@ -154,17 +189,18 @@ if __name__ == "__main__":
     
     
     model_name_or_path = [
-        'michiyasunaga/BioLinkBERT-base',
+        # 'michiyasunaga/BioLinkBERT-base',
        'emilyalsentzer/Bio_ClinicalBERT',
     #    'yikuan8/Clinical-Longformer',
-       'michiyasunaga/LinkBERT-base',
+    #    'michiyasunaga/LinkBERT-base',
        'nlpie/bio-mobilebert',
        'nlpie/distil-biobert', 
        'meta-llama/Llama-2-7b-hf',
-       '/mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/',
-       '/mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/',
+    #    '/mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/',
+    #    '/mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/',
        'roberta-base',
-       '/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_weighted/sampled_250000/07-07-2023--08-30/checkpoint-30000/',
+       'dmis-lab/biobert-v1.1',
+    #    '/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_weighted/sampled_250000/07-07-2023--08-30/checkpoint-30000/',
        'nlpie/tiny-biobert',
        'bert-base-uncased',
          'google/mobilebert-uncased',
@@ -177,6 +213,8 @@ if __name__ == "__main__":
        'nlpie/clinical-mobilebert',       
      'nlpie/tiny-clinicalbert'
        ]
+    
+
 
     model_type_mappings = {
                 "roberta-base": "roberta-base",
