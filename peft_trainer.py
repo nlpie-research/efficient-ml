@@ -141,6 +141,10 @@ def parse_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
     # Required parameters
+    parser.add_argument("--random_seed",
+                        default = 42,
+                        type = int,
+                        help = "Random seed for reproducibility")
     parser.add_argument("--data_dir",
                         default = "",
                         type=str,
@@ -983,10 +987,9 @@ def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
 
     # set study name based on peft_type 
     if args.peft_method == "LORA":
-        
         m = args.model_name_or_path.split("/")[-1]
-        study_name = f'{m}_LORARank-{args.lora_rank}'
-        storage_name = "sqlite:///./Runs/optuna/peft_optuna_v2.db"
+        study_name = f'{m}_v2_LORARank-{args.lora_rank}'
+        storage_name = "sqlite:////mnt/sdd/efficient_ml_data/optuna_dbs/Runs/peft_optuna_v2.db"
     elif args.peft_method == "IA3":
         m = args.model_name_or_path.split("/")[-1]
         study_name = f'{m}_IA3'
@@ -1017,6 +1020,8 @@ def tune_hyperparams(model, args:argparse.Namespace, trainer:Trainer) -> None:
 def main() -> None:
     args = parse_args()    
     args = get_dataset_directory_details(args)
+
+    set_seed(args.seed)
 
     # setup params
     data_dir = args.data_dir

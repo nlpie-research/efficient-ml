@@ -1,9 +1,10 @@
-model_name_or_path=(nlpie/bio-mobilebert
-                    nlpie/tiny-biobert
-                    nlpie/distil-biobert
-                    dmis-lab/biobert-v1.1
-                    roberta-base
-                    )
+# model_name_or_path=(nlpie/bio-mobilebert
+#                     nlpie/tiny-biobert
+#                     dmis-lab/biobert-v1.1
+#                     roberta-base
+#                     nlpie/bio-distilbert-uncased
+#                     )
+model_name_or_path=(roberta-base)
 peft_methods=(LORA Full)
 task=mimic-mp
 max_epochs=10
@@ -39,7 +40,7 @@ do
                     --max_epochs "$max_epochs" \
                     --evaluation_strategy epoch \
                     --saving_strategy epoch \
-                    --scheduler_type constant \
+                    --scheduler_type linear \
                     --task "$task" \
                     --peft_method $peft_method \
                     --log_save_dir $log_save_dir \
@@ -56,7 +57,7 @@ do
                     --max_epochs "$max_epochs" \
                     --evaluation_strategy epoch \
                     --saving_strategy epoch \
-                    --scheduler_type constant \
+                    --scheduler_type linear \
                     --task "$task" \
                     --peft_method $peft_method \
                     --log_save_dir $log_save_dir \
