@@ -4,6 +4,7 @@ from peft import (LoraConfig, PeftType, PrefixTuningConfig,
                   prepare_model_for_int8_training,
                   prepare_model_for_kbit_training, set_peft_model_state_dict)
 from scipy.special import softmax
+import torch
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -23,6 +24,7 @@ from peft_trainer import create_peft_config
 import yaml
 import copy
 import argparse
+from thop import profile # for flops calc
 
 def parse_args() -> argparse.Namespace:
 
@@ -108,7 +110,14 @@ def get_number_of_trainable_params(args:argparse.Namespace,
             try:
                 if peft_method == "Full":
                     peft_model = copy.deepcopy(model)
+                    # FLOPs too
+                    input_ids = torch.tensor([[101, 2023, 2003, 1037, 2047, 2814, 1012, 102]])                
+                    raw_flops, params = profile(peft_model, inputs=(input_ids,))
+                    # convert flops to scientific notation
+                    flops = "{:.2e}".format(raw_flops)
                 else:
+                    # hardcode raw_flops and flops for PEFT - it doesn't work with the thop package
+                    raw_flops, flops = None, None
                     # set up some PEFT params
                     peft_config, lr = create_peft_config(args, peft_method, model_name_or_path, task_type)
                     peft_model = get_peft_model(copy.deepcopy(model), peft_config)
@@ -139,6 +148,8 @@ def get_number_of_trainable_params(args:argparse.Namespace,
                 peft_model_size_MB, peft_model_size_GB = get_model_size(peft_model)
                 peft_full_model_size_MB, peft_full_model_size_GB = get_full_model_size(peft_model)
                 
+   
+                
                 # store the model name, peft method and number of trainable params
                 # model_dict[peft_method] = {"n_peft_params": n_peft_params,
                 #                     "total_params": total_params,
@@ -157,7 +168,9 @@ def get_number_of_trainable_params(args:argparse.Namespace,
                                     "peft_model_size_MB": peft_model_size_MB,
                                     "peft_model_size_GB": peft_model_size_GB,
                                     "peft_full_model_size_MB": peft_full_model_size_MB,
-                                    "peft_full_model_size_GB": peft_full_model_size_GB,}
+                                    "peft_full_model_size_GB": peft_full_model_size_GB,
+                                    "FLOPs": flops,
+                                    "raw_FLOPS": raw_flops}
                 
             except Exception as e:
                 print(f"Error for {model_name_or_path} and {peft_method}")
@@ -175,7 +188,9 @@ def get_number_of_trainable_params(args:argparse.Namespace,
                                     "peft_model_size_MB": None,
                                     "peft_model_size_GB": None,
                                     "peft_full_model_size_MB": None,
-                                    "peft_full_model_size_GB": None,}
+                                    "peft_full_model_size_GB": None,
+                                    "FLOPs": None,
+                                    "raw_FLOPS": None}
                 
                 
             
@@ -213,6 +228,12 @@ if __name__ == "__main__":
        'nlpie/clinical-mobilebert',       
      'nlpie/tiny-clinicalbert'
        ]
+    
+    
+    # model_name_or_path = [
+    
+    #  'nlpie/tiny-clinicalbert'
+    #    ]
     
 
 
