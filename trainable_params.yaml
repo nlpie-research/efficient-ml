@@ -1,876 +1,976 @@
-/mnt/sdc/niallt/saved_models/declutr/mimic/few_epoch/mimic-roberta-base/2_anch_2_pos_min_1024/transformer_format/:
+bert-base-uncased:
   Full:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 124055040
-    n_peft_params_perc: 99.524955119318
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
+    FLOPs: '6.81e+08'
+    full_model_size_GB: 0.8157982006669044
+    full_model_size_MB: 835.3773574829102
+    model_size_GB: 0.40785885602235794
+    model_size_MB: 417.64746856689453
+    n_peft_params: 109482240
+    n_peft_params_perc: 99.99859522567809
+    n_trainable_params: 109483778
+    peft_full_model_size_GB: 0.8158550411462784
+    peft_full_model_size_MB: 835.4355621337891
+    peft_model_size_GB: 0.40785885602235794
+    peft_model_size_MB: 417.64746856689453
+    raw_FLOPS: 680683008.0
+    total_params: 109483778
   IA3:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
+    FLOPs: null
+    full_model_size_GB: 0.8157982006669044
+    full_model_size_MB: 835.3773574829102
+    model_size_GB: 0.40785885602235794
+    model_size_MB: 417.64746856689453
     n_peft_params: 64512
-    n_peft_params_perc: 0.05175568767425686
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
+    n_peft_params_perc: 0.058923797825098795
+    n_trainable_params: 66050
+    peft_full_model_size_GB: 0.4084585942327976
+    peft_full_model_size_MB: 418.26160049438477
+    peft_model_size_GB: 0.0002460554242134094
+    peft_model_size_MB: 0.25196075439453125
+    raw_FLOPS: null
+    total_params: 109483778
   LORA:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
+    FLOPs: null
+    full_model_size_GB: 0.8157982006669044
+    full_model_size_MB: 835.3773574829102
+    model_size_GB: 0.40785885602235794
+    model_size_MB: 417.64746856689453
     n_peft_params: 294912
-    n_peft_params_perc: 0.23659742936803138
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
+    n_peft_params_perc: 0.26936593291473737
+    n_trainable_params: 296450
+    peft_full_model_size_GB: 0.41018903627991676
+    peft_full_model_size_MB: 420.03357315063477
+    peft_model_size_GB: 0.0011043623089790344
+    peft_model_size_MB: 1.1308670043945312
+    raw_FLOPS: null
+    total_params: 109483778
   PREFIX_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
+    FLOPs: null
+    full_model_size_GB: 0.8157982006669044
+    full_model_size_MB: 835.3773574829102
+    model_size_GB: 0.40785885602235794
+    model_size_MB: 417.64746856689453
     n_peft_params: 184320
-    n_peft_params_perc: 0.14787339335501962
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  PROMPT_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.0061613913897924835
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  P_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.1778588314520097
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-? /mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000/
-: Full:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 124055040
-    n_peft_params_perc: 99.524955119318
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
+    n_peft_params_perc: 0.16835370807171088
+    n_trainable_params: 185858
+    peft_full_model_size_GB: 0.4093299228698015
+    peft_full_model_size_MB: 419.15384101867676
+    peft_model_size_GB: 0.0006923750042915344
+    peft_model_size_MB: 0.7089920043945312
+    raw_FLOPS: null
+    total_params: 109483778
+distilbert-base-uncased:
+  Full:
+    FLOPs: '3.41e+08'
+    full_model_size_GB: 0.4988942537456751
+    full_model_size_MB: 510.8677158355713
+    model_size_GB: 0.24942684918642044
+    model_size_MB: 255.41309356689453
+    n_peft_params: 66953472
+    n_peft_params_perc: 99.99770293515003
+    n_trainable_params: 66955010
+    peft_full_model_size_GB: 0.4989133160561323
+    peft_full_model_size_MB: 510.8872356414795
+    peft_model_size_GB: 0.24942684918642044
+    peft_model_size_MB: 255.41309356689453
+    raw_FLOPS: 340649472.0
+    total_params: 66955010
   IA3:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 64512
-    n_peft_params_perc: 0.05175568767425686
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
+    FLOPs: null
+    full_model_size_GB: 0.4988942537456751
+    full_model_size_MB: 510.8677158355713
+    model_size_GB: 0.24942684918642044
+    model_size_MB: 255.41309356689453
+    n_peft_params: 622848
+    n_peft_params_perc: 0.9302485355464811
+    n_trainable_params: 624386
+    peft_full_model_size_GB: 0.2541342247277498
+    peft_full_model_size_MB: 260.2334461212158
+    peft_model_size_GB: 0.0023260191082954407
+    peft_model_size_MB: 2.3818435668945312
+    raw_FLOPS: null
+    total_params: 66955010
   LORA:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 294912
-    n_peft_params_perc: 0.23659742936803138
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
+    FLOPs: null
+    full_model_size_GB: 0.4988942537456751
+    full_model_size_MB: 510.8677158355713
+    model_size_GB: 0.24942684918642044
+    model_size_MB: 255.41309356689453
+    n_peft_params: 811776
+    n_peft_params_perc: 1.2124201011992979
+    n_trainable_params: 813314
+    peft_full_model_size_GB: 0.2555577401071787
+    peft_full_model_size_MB: 261.691125869751
+    peft_model_size_GB: 0.003029830753803253
+    peft_model_size_MB: 3.1025466918945312
+    raw_FLOPS: null
+    total_params: 66955010
   PREFIX_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 184320
-    n_peft_params_perc: 0.14787339335501962
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  PROMPT_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.0061613913897924835
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  P_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.1778588314520097
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-? /mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_weighted/sampled_250000/07-07-2023--08-30/checkpoint-30000/
-: Full:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 124055040
-    n_peft_params_perc: 99.524955119318
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  IA3:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 64512
-    n_peft_params_perc: 0.05175568767425686
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  LORA:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 294912
-    n_peft_params_perc: 0.23659742936803138
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  PREFIX_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 184320
-    n_peft_params_perc: 0.14787339335501962
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  PROMPT_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.0061613913897924835
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  P_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.1778588314520097
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
+    FLOPs: null
+    full_model_size_GB: 0.4988942537456751
+    full_model_size_MB: 510.8677158355713
+    model_size_GB: 0.24942684918642044
+    model_size_MB: 255.41309356689453
+    n_peft_params: 774912
+    n_peft_params_perc: 1.1573622347304555
+    n_trainable_params: 776450
+    peft_full_model_size_GB: 0.25525668263435364
+    peft_full_model_size_MB: 261.3828430175781
+    peft_model_size_GB: 0.002892501652240753
+    peft_model_size_MB: 2.9619216918945312
+    raw_FLOPS: null
+    total_params: 66955010
 dmis-lab/biobert-v1.1:
   Full:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
+    FLOPs: '6.81e+08'
+    full_model_size_GB: 0.8070663586258888
+    full_model_size_MB: 826.4359512329102
     model_size_GB: 0.40349293500185013
     model_size_MB: 413.17676544189453
     n_peft_params: 108310272
     n_peft_params_perc: 99.99858002557616
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
+    n_trainable_params: 108311810
+    peft_full_model_size_GB: 0.8071231991052628
+    peft_full_model_size_MB: 826.4941558837891
     peft_model_size_GB: 0.40349293500185013
     peft_model_size_MB: 413.17676544189453
+    raw_FLOPS: 680683008.0
     total_params: 108311810
   IA3:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
+    FLOPs: null
+    full_model_size_GB: 0.8070663586258888
+    full_model_size_MB: 826.4359512329102
     model_size_GB: 0.40349293500185013
     model_size_MB: 413.17676544189453
     n_peft_params: 64512
     n_peft_params_perc: 0.05956137193164808
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
+    n_trainable_params: 66050
+    peft_full_model_size_GB: 0.4040926732122898
+    peft_full_model_size_MB: 413.79089736938477
+    peft_model_size_GB: 0.0002460554242134094
+    peft_model_size_MB: 0.25196075439453125
+    raw_FLOPS: null
     total_params: 108311810
   LORA:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
+    FLOPs: null
+    full_model_size_GB: 0.8070663586258888
+    full_model_size_MB: 826.4359512329102
     model_size_GB: 0.40349293500185013
     model_size_MB: 413.17676544189453
     n_peft_params: 294912
     n_peft_params_perc: 0.2722805574018198
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
+    n_trainable_params: 296450
+    peft_full_model_size_GB: 0.40582311525940895
+    peft_full_model_size_MB: 415.56287002563477
+    peft_model_size_GB: 0.0011043623089790344
+    peft_model_size_MB: 1.1308670043945312
+    raw_FLOPS: null
     total_params: 108311810
   PREFIX_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
+    FLOPs: null
+    full_model_size_GB: 0.8070663586258888
+    full_model_size_MB: 826.4359512329102
     model_size_GB: 0.40349293500185013
     model_size_MB: 413.17676544189453
     n_peft_params: 184320
     n_peft_params_perc: 0.17017534837613738
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-  PROMPT_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.007090639515672391
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-  P_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.20468312735240968
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
+    n_trainable_params: 185858
+    peft_full_model_size_GB: 0.4049640018492937
+    peft_full_model_size_MB: 414.68313789367676
+    peft_model_size_GB: 0.0006923750042915344
+    peft_model_size_MB: 0.7089920043945312
+    raw_FLOPS: null
     total_params: 108311810
 emilyalsentzer/Bio_ClinicalBERT:
   Full:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
+    FLOPs: '6.81e+08'
+    full_model_size_GB: 0.8070663586258888
+    full_model_size_MB: 826.4359512329102
     model_size_GB: 0.40349293500185013
     model_size_MB: 413.17676544189453
     n_peft_params: 108310272
     n_peft_params_perc: 99.99858002557616
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
+    n_trainable_params: 108311810
+    peft_full_model_size_GB: 0.8071231991052628
+    peft_full_model_size_MB: 826.4941558837891
     peft_model_size_GB: 0.40349293500185013
     peft_model_size_MB: 413.17676544189453
+    raw_FLOPS: 680683008.0
     total_params: 108311810
   IA3:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
+    FLOPs: null
+    full_model_size_GB: 0.8070663586258888
+    full_model_size_MB: 826.4359512329102
     model_size_GB: 0.40349293500185013
     model_size_MB: 413.17676544189453
     n_peft_params: 64512
     n_peft_params_perc: 0.05956137193164808
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
+    n_trainable_params: 66050
+    peft_full_model_size_GB: 0.4040926732122898
+    peft_full_model_size_MB: 413.79089736938477
+    peft_model_size_GB: 0.0002460554242134094
+    peft_model_size_MB: 0.25196075439453125
+    raw_FLOPS: null
     total_params: 108311810
   LORA:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
+    FLOPs: null
+    full_model_size_GB: 0.8070663586258888
+    full_model_size_MB: 826.4359512329102
     model_size_GB: 0.40349293500185013
     model_size_MB: 413.17676544189453
     n_peft_params: 294912
     n_peft_params_perc: 0.2722805574018198
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
+    n_trainable_params: 296450
+    peft_full_model_size_GB: 0.40582311525940895
+    peft_full_model_size_MB: 415.56287002563477
+    peft_model_size_GB: 0.0011043623089790344
+    peft_model_size_MB: 1.1308670043945312
+    raw_FLOPS: null
     total_params: 108311810
   PREFIX_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
+    FLOPs: null
+    full_model_size_GB: 0.8070663586258888
+    full_model_size_MB: 826.4359512329102
     model_size_GB: 0.40349293500185013
     model_size_MB: 413.17676544189453
     n_peft_params: 184320
     n_peft_params_perc: 0.17017534837613738
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
+    n_trainable_params: 185858
+    peft_full_model_size_GB: 0.4049640018492937
+    peft_full_model_size_MB: 414.68313789367676
+    peft_model_size_GB: 0.0006923750042915344
+    peft_model_size_MB: 0.7089920043945312
+    raw_FLOPS: null
     total_params: 108311810
-  PROMPT_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.007090639515672391
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-  P_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.20468312735240968
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-meta-llama/Llama-2-7b-hf:
+google/mobilebert-uncased:
   Full:
-    full_model_size_GB: 49.35374285187572
-    full_model_size_MB: 50538.23268032074
-    model_size_GB: 24.614303588867188
-    model_size_MB: 25205.046875
-    n_peft_params: 6607343616
-    n_peft_params_perc: 99.99987601689394
-    peft_full_model_size_GB: 49.35374285187572
-    peft_full_model_size_MB: 50538.23268032074
-    peft_model_size_GB: 24.614303588867188
-    peft_model_size_MB: 25205.046875
-    total_params: 6607351808
-  IA3:
-    full_model_size_GB: 49.35374285187572
-    full_model_size_MB: 50538.23268032074
-    model_size_GB: 24.614303588867188
-    model_size_MB: 25205.046875
-    n_peft_params: 614400
-    n_peft_params_perc: 0.0092987329546476
-    peft_full_model_size_GB: 49.35374285187572
-    peft_full_model_size_MB: 50538.23268032074
-    peft_model_size_GB: 24.614303588867188
-    peft_model_size_MB: 25205.046875
-    total_params: 6607351808
-  LORA:
-    full_model_size_GB: 49.35374285187572
-    full_model_size_MB: 50538.23268032074
-    model_size_GB: 24.614303588867188
-    model_size_MB: 25205.046875
-    n_peft_params: 4194304
-    n_peft_params_perc: 0.06347935030372762
-    peft_full_model_size_GB: 49.35374285187572
-    peft_full_model_size_MB: 50538.23268032074
-    peft_model_size_GB: 24.614303588867188
-    peft_model_size_MB: 25205.046875
-    total_params: 6607351808
-  PREFIX_TUNING:
-    full_model_size_GB: 49.35374285187572
-    full_model_size_MB: 50538.23268032074
-    model_size_GB: 24.614303588867188
-    model_size_MB: 25205.046875
-    n_peft_params: 2621440
-    n_peft_params_perc: 0.03967459393982976
-    peft_full_model_size_GB: 49.35374285187572
-    peft_full_model_size_MB: 50538.23268032074
-    peft_model_size_GB: 24.614303588867188
-    peft_model_size_MB: 25205.046875
-    total_params: 6607351808
-  PROMPT_TUNING:
-    full_model_size_GB: 49.35374285187572
-    full_model_size_MB: 50538.23268032074
-    model_size_GB: 24.614303588867188
-    model_size_MB: 25205.046875
-    n_peft_params: 40960
-    n_peft_params_perc: 0.00061991553030984
-    peft_full_model_size_GB: 49.35374285187572
-    peft_full_model_size_MB: 50538.23268032074
-    peft_model_size_GB: 24.614303588867188
-    peft_model_size_MB: 25205.046875
-    total_params: 6607351808
-  P_TUNING:
-    full_model_size_GB: 49.35374285187572
-    full_model_size_MB: 50538.23268032074
-    model_size_GB: 24.614303588867188
-    model_size_MB: 25205.046875
-    n_peft_params: 1110272
-    n_peft_params_perc: 0.016803585343461103
-    peft_full_model_size_GB: 49.35374285187572
-    peft_full_model_size_MB: 50538.23268032074
-    peft_model_size_GB: 24.614303588867188
-    peft_model_size_MB: 25205.046875
-    total_params: 6607351808
-michiyasunaga/BioLinkBERT-base:
-  Full:
-    full_model_size_GB: 0.8064921395853162
-    full_model_size_MB: 825.8479509353638
-    model_size_GB: 0.40320397168397903
-    model_size_MB: 412.88086700439453
-    n_peft_params: 108232704
-    n_peft_params_perc: 99.99857900792615
-    peft_full_model_size_GB: 0.8064921395853162
-    peft_full_model_size_MB: 825.8479509353638
-    peft_model_size_GB: 0.40320397168397903
-    peft_model_size_MB: 412.88086700439453
-    total_params: 108234242
-  IA3:
-    full_model_size_GB: 0.8064921395853162
-    full_model_size_MB: 825.8479509353638
-    model_size_GB: 0.40320397168397903
-    model_size_MB: 412.88086700439453
-    n_peft_params: 64512
-    n_peft_params_perc: 0.05960405765118215
-    peft_full_model_size_GB: 0.8064921395853162
-    peft_full_model_size_MB: 825.8479509353638
-    peft_model_size_GB: 0.40320397168397903
-    peft_model_size_MB: 412.88086700439453
-    total_params: 108234242
-  LORA:
-    full_model_size_GB: 0.8064921395853162
-    full_model_size_MB: 825.8479509353638
-    model_size_GB: 0.40320397168397903
-    model_size_MB: 412.88086700439453
-    n_peft_params: 294912
-    n_peft_params_perc: 0.2724756921196898
-    peft_full_model_size_GB: 0.8064921395853162
-    peft_full_model_size_MB: 825.8479509353638
-    peft_model_size_GB: 0.40320397168397903
-    peft_model_size_MB: 412.88086700439453
-    total_params: 108234242
-  PREFIX_TUNING:
-    full_model_size_GB: 0.8064921395853162
-    full_model_size_MB: 825.8479509353638
-    model_size_GB: 0.40320397168397903
-    model_size_MB: 412.88086700439453
-    n_peft_params: 184320
-    n_peft_params_perc: 0.17029730757480613
-    peft_full_model_size_GB: 0.8064921395853162
-    peft_full_model_size_MB: 825.8479509353638
-    peft_model_size_GB: 0.40320397168397903
-    peft_model_size_MB: 412.88086700439453
-    total_params: 108234242
-  PROMPT_TUNING:
-    full_model_size_GB: 0.8064921395853162
-    full_model_size_MB: 825.8479509353638
-    model_size_GB: 0.40320397168397903
-    model_size_MB: 412.88086700439453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.007095721148950255
-    peft_full_model_size_GB: 0.8064921395853162
-    peft_full_model_size_MB: 825.8479509353638
-    peft_model_size_GB: 0.40320397168397903
-    peft_model_size_MB: 412.88086700439453
-    total_params: 108234242
-  P_TUNING:
-    full_model_size_GB: 0.8064921395853162
-    full_model_size_MB: 825.8479509353638
-    model_size_GB: 0.40320397168397903
-    model_size_MB: 412.88086700439453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.20482981716636403
-    peft_full_model_size_GB: 0.8064921395853162
-    peft_full_model_size_MB: 825.8479509353638
-    peft_model_size_GB: 0.40320397168397903
-    peft_model_size_MB: 412.88086700439453
-    total_params: 108234242
-michiyasunaga/LinkBERT-base:
-  Full:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 108310272
-    n_peft_params_perc: 99.99858002557616
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-  IA3:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 64512
-    n_peft_params_perc: 0.05956137193164808
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-  LORA:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 294912
-    n_peft_params_perc: 0.2722805574018198
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-  PREFIX_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 184320
-    n_peft_params_perc: 0.17017534837613738
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-  PROMPT_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.007090639515672391
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-  P_TUNING:
-    full_model_size_GB: 0.8070700662210584
-    full_model_size_MB: 826.4397478103638
-    model_size_GB: 0.40349293500185013
-    model_size_MB: 413.17676544189453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.20468312735240968
-    peft_full_model_size_GB: 0.8070700662210584
-    peft_full_model_size_MB: 826.4397478103638
-    peft_model_size_GB: 0.40349293500185013
-    peft_model_size_MB: 413.17676544189453
-    total_params: 108311810
-nlpie/bio-mobilebert:
-  Full:
-    full_model_size_GB: 0.18358392175287008
-    full_model_size_MB: 187.98993587493896
+    FLOPs: '1.62e+08'
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
     model_size_GB: 0.09157849103212357
     model_size_MB: 93.77637481689453
     n_peft_params: 24581888
     n_peft_params_perc: 99.99582636948573
-    peft_full_model_size_GB: 0.18358392175287008
-    peft_full_model_size_MB: 187.98993587493896
+    n_trainable_params: 24582914
+    peft_full_model_size_GB: 0.18400699365884066
+    peft_full_model_size_MB: 188.42316150665283
     peft_model_size_GB: 0.09157849103212357
     peft_model_size_MB: 93.77637481689453
+    raw_FLOPS: 162006016.0
     total_params: 24582914
   IA3:
-    full_model_size_GB: 0.18358392175287008
-    full_model_size_MB: 187.98993587493896
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
     model_size_GB: 0.09157849103212357
     model_size_MB: 93.77637481689453
     n_peft_params: 58368
     n_peft_params_perc: 0.23743320258940823
-    peft_full_model_size_GB: 0.18358392175287008
-    peft_full_model_size_MB: 187.98993587493896
-    peft_model_size_GB: 0.09157849103212357
-    peft_model_size_MB: 93.77637481689453
+    n_trainable_params: 59394
+    peft_full_model_size_GB: 0.09255178179591894
+    peft_full_model_size_MB: 94.773024559021
+    peft_model_size_GB: 0.00022125989198684692
+    peft_model_size_MB: 0.22657012939453125
+    raw_FLOPS: null
     total_params: 24582914
   LORA:
-    full_model_size_GB: 0.18358392175287008
-    full_model_size_MB: 187.98993587493896
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
     model_size_GB: 0.09157849103212357
     model_size_MB: 93.77637481689453
     n_peft_params: 221184
     n_peft_params_perc: 0.8997468729703891
-    peft_full_model_size_GB: 0.18358392175287008
-    peft_full_model_size_MB: 187.98993587493896
-    peft_model_size_GB: 0.09157849103212357
-    peft_model_size_MB: 93.77637481689453
+    n_trainable_params: 222210
+    peft_full_model_size_GB: 0.09379831608384848
+    peft_full_model_size_MB: 96.04947566986084
+    peft_model_size_GB: 0.0008277967572212219
+    peft_model_size_MB: 0.8476638793945312
+    raw_FLOPS: null
     total_params: 24582914
   PREFIX_TUNING:
-    full_model_size_GB: 0.18358392175287008
-    full_model_size_MB: 187.98993587493896
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
     model_size_GB: 0.09157849103212357
     model_size_MB: 93.77637481689453
     n_peft_params: 245760
     n_peft_params_perc: 0.9997187477448768
-    peft_full_model_size_GB: 0.18358392175287008
-    peft_full_model_size_MB: 187.98993587493896
-    peft_model_size_GB: 0.09157849103212357
-    peft_model_size_MB: 93.77637481689453
+    n_trainable_params: 246786
+    peft_full_model_size_GB: 0.09386538527905941
+    peft_full_model_size_MB: 96.11815452575684
+    peft_model_size_GB: 0.0009193494915962219
+    peft_model_size_MB: 0.9414138793945312
+    raw_FLOPS: null
     total_params: 24582914
-  PROMPT_TUNING:
-    full_model_size_GB: 0.18358392175287008
-    full_model_size_MB: 187.98993587493896
+huawei-noah/TinyBERT_General_4L_312D:
+  Full:
+    FLOPs: '3.66e+07'
+    full_model_size_GB: 0.10695514362305403
+    full_model_size_MB: 109.52206707000732
+    model_size_GB: 0.05346117168664932
+    model_size_MB: 54.744239807128906
+    n_peft_params: 14350248
+    n_peft_params_perc: 99.99563789633997
+    n_trainable_params: 14350874
+    peft_full_model_size_GB: 0.10697795450687408
+    peft_full_model_size_MB: 109.54542541503906
+    peft_model_size_GB: 0.05346117168664932
+    peft_model_size_MB: 54.744239807128906
+    raw_FLOPS: 36609456.0
+    total_params: 14350874
+  IA3:
+    FLOPs: null
+    full_model_size_GB: 0.10695514362305403
+    full_model_size_MB: 109.52206707000732
+    model_size_GB: 0.05346117168664932
+    model_size_MB: 54.744239807128906
+    n_peft_params: 8544
+    n_peft_params_perc: 0.059536443564343185
+    n_trainable_params: 9170
+    peft_full_model_size_GB: 0.05357171315699816
+    peft_full_model_size_MB: 54.85743427276611
+    peft_model_size_GB: 3.416091203689575e-05
+    peft_model_size_MB: 0.03498077392578125
+    raw_FLOPS: null
+    total_params: 14350874
+  LORA:
+    FLOPs: null
+    full_model_size_GB: 0.10695514362305403
+    full_model_size_MB: 109.52206707000732
+    model_size_GB: 0.05346117168664932
+    model_size_MB: 54.744239807128906
+    n_peft_params: 59904
+    n_peft_params_perc: 0.4174240537544961
+    n_trainable_params: 60530
+    peft_full_model_size_GB: 0.05396472383290529
+    peft_full_model_size_MB: 55.25987720489502
+    peft_model_size_GB: 0.00022549182176589966
+    peft_model_size_MB: 0.23090362548828125
+    raw_FLOPS: null
+    total_params: 14350874
+  PREFIX_TUNING:
+    FLOPs: null
+    full_model_size_GB: 0.10695514362305403
+    full_model_size_MB: 109.52206707000732
+    model_size_GB: 0.05346117168664932
+    model_size_MB: 54.744239807128906
+    n_peft_params: 24960
+    n_peft_params_perc: 0.17392668906437336
+    n_trainable_params: 25586
+    peft_full_model_size_GB: 0.0536875668913126
+    peft_full_model_size_MB: 54.9760684967041
+    peft_model_size_GB: 9.531527757644653e-05
+    peft_model_size_MB: 0.09760284423828125
+    raw_FLOPS: null
+    total_params: 14350874
+meta-llama/Llama-2-7b-hf:
+  Full:
+    FLOPs: '5.18e+10'
+    full_model_size_GB: 49.35372592881322
+    full_model_size_MB: 50538.215351104736
+    model_size_GB: 24.614303588867188
+    model_size_MB: 25205.046875
+    n_peft_params: 6607343616
+    n_peft_params_perc: 99.99987601689394
+    n_trainable_params: 6607351808
+    peft_full_model_size_GB: 49.35386596247554
+    peft_full_model_size_MB: 50538.35874557495
+    peft_model_size_GB: 24.614303588867188
+    peft_model_size_MB: 25205.046875
+    raw_FLOPS: 51808108544.0
+    total_params: 6607351808
+  IA3:
+    FLOPs: null
+    full_model_size_GB: 49.35372592881322
+    full_model_size_MB: 50538.215351104736
+    model_size_GB: 24.614303588867188
+    model_size_MB: 25205.046875
+    n_peft_params: 614400
+    n_peft_params_perc: 0.0092987329546476
+    n_trainable_params: 622592
+    peft_full_model_size_GB: 24.74411162547767
+    peft_full_model_size_MB: 25337.970304489136
+    peft_model_size_GB: 0.0023193359375
+    peft_model_size_MB: 2.375
+    raw_FLOPS: null
+    total_params: 6607351808
+  LORA:
+    FLOPs: null
+    full_model_size_GB: 49.35372592881322
+    full_model_size_MB: 50538.215351104736
+    model_size_GB: 24.614303588867188
+    model_size_MB: 25205.046875
+    n_peft_params: 4194304
+    n_peft_params_perc: 0.06347935030372762
+    n_trainable_params: 4202496
+    peft_full_model_size_GB: 24.770829943940043
+    peft_full_model_size_MB: 25365.329862594604
+    peft_model_size_GB: 0.015655517578125
+    peft_model_size_MB: 16.03125
+    raw_FLOPS: null
+    total_params: 6607351808
+  PREFIX_TUNING:
+    FLOPs: null
+    full_model_size_GB: 49.35372592881322
+    full_model_size_MB: 50538.215351104736
+    model_size_GB: 24.614303588867188
+    model_size_MB: 25205.046875
+    n_peft_params: 2621440
+    n_peft_params_perc: 0.03967459393982976
+    n_trainable_params: 2629632
+    peft_full_model_size_GB: 24.75902334600687
+    peft_full_model_size_MB: 25353.239906311035
+    peft_model_size_GB: 0.009796142578125
+    peft_model_size_MB: 10.03125
+    raw_FLOPS: null
+    total_params: 6607351808
+nlpie/bio-distilbert-uncased:
+  Full:
+    FLOPs: '3.41e+08'
+    full_model_size_GB: 0.4988942537456751
+    full_model_size_MB: 510.8677158355713
+    model_size_GB: 0.24942684918642044
+    model_size_MB: 255.41309356689453
+    n_peft_params: 66953472
+    n_peft_params_perc: 99.99770293515003
+    n_trainable_params: 66955010
+    peft_full_model_size_GB: 0.4989133160561323
+    peft_full_model_size_MB: 510.8872356414795
+    peft_model_size_GB: 0.24942684918642044
+    peft_model_size_MB: 255.41309356689453
+    raw_FLOPS: 340649472.0
+    total_params: 66955010
+  IA3:
+    FLOPs: null
+    full_model_size_GB: 0.4988942537456751
+    full_model_size_MB: 510.8677158355713
+    model_size_GB: 0.24942684918642044
+    model_size_MB: 255.41309356689453
+    n_peft_params: 622848
+    n_peft_params_perc: 0.9302485355464811
+    n_trainable_params: 624386
+    peft_full_model_size_GB: 0.2541342247277498
+    peft_full_model_size_MB: 260.2334461212158
+    peft_model_size_GB: 0.0023260191082954407
+    peft_model_size_MB: 2.3818435668945312
+    raw_FLOPS: null
+    total_params: 66955010
+  LORA:
+    FLOPs: null
+    full_model_size_GB: 0.4988942537456751
+    full_model_size_MB: 510.8677158355713
+    model_size_GB: 0.24942684918642044
+    model_size_MB: 255.41309356689453
+    n_peft_params: 811776
+    n_peft_params_perc: 1.2124201011992979
+    n_trainable_params: 813314
+    peft_full_model_size_GB: 0.2555577401071787
+    peft_full_model_size_MB: 261.691125869751
+    peft_model_size_GB: 0.003029830753803253
+    peft_model_size_MB: 3.1025466918945312
+    raw_FLOPS: null
+    total_params: 66955010
+  PREFIX_TUNING:
+    FLOPs: null
+    full_model_size_GB: 0.4988942537456751
+    full_model_size_MB: 510.8677158355713
+    model_size_GB: 0.24942684918642044
+    model_size_MB: 255.41309356689453
+    n_peft_params: 774912
+    n_peft_params_perc: 1.1573622347304555
+    n_trainable_params: 776450
+    peft_full_model_size_GB: 0.25525668263435364
+    peft_full_model_size_MB: 261.3828430175781
+    peft_model_size_GB: 0.002892501652240753
+    peft_model_size_MB: 2.9619216918945312
+    raw_FLOPS: null
+    total_params: 66955010
+nlpie/bio-mobilebert:
+  Full:
+    FLOPs: '1.62e+08'
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
     model_size_GB: 0.09157849103212357
     model_size_MB: 93.77637481689453
-    n_peft_params: 1280
-    n_peft_params_perc: 0.005206868477837899
-    peft_full_model_size_GB: 0.18358392175287008
-    peft_full_model_size_MB: 187.98993587493896
+    n_peft_params: 24581888
+    n_peft_params_perc: 99.99582636948573
+    n_trainable_params: 24582914
+    peft_full_model_size_GB: 0.18400699365884066
+    peft_full_model_size_MB: 188.42316150665283
     peft_model_size_GB: 0.09157849103212357
     peft_model_size_MB: 93.77637481689453
+    raw_FLOPS: 162006016.0
     total_params: 24582914
-  P_TUNING:
-    full_model_size_GB: 0.18358392175287008
-    full_model_size_MB: 187.98993587493896
+  IA3:
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
     model_size_GB: 0.09157849103212357
     model_size_MB: 93.77637481689453
-    n_peft_params: 153344
-    n_peft_params_perc: 0.6237828436449804
-    peft_full_model_size_GB: 0.18358392175287008
-    peft_full_model_size_MB: 187.98993587493896
+    n_peft_params: 58368
+    n_peft_params_perc: 0.23743320258940823
+    n_trainable_params: 59394
+    peft_full_model_size_GB: 0.09255178179591894
+    peft_full_model_size_MB: 94.773024559021
+    peft_model_size_GB: 0.00022125989198684692
+    peft_model_size_MB: 0.22657012939453125
+    raw_FLOPS: null
+    total_params: 24582914
+  LORA:
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
+    model_size_GB: 0.09157849103212357
+    model_size_MB: 93.77637481689453
+    n_peft_params: 221184
+    n_peft_params_perc: 0.8997468729703891
+    n_trainable_params: 222210
+    peft_full_model_size_GB: 0.09379831608384848
+    peft_full_model_size_MB: 96.04947566986084
+    peft_model_size_GB: 0.0008277967572212219
+    peft_model_size_MB: 0.8476638793945312
+    raw_FLOPS: null
+    total_params: 24582914
+  PREFIX_TUNING:
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
+    model_size_GB: 0.09157849103212357
+    model_size_MB: 93.77637481689453
+    n_peft_params: 245760
+    n_peft_params_perc: 0.9997187477448768
+    n_trainable_params: 246786
+    peft_full_model_size_GB: 0.09386538527905941
+    peft_full_model_size_MB: 96.11815452575684
+    peft_model_size_GB: 0.0009193494915962219
+    peft_model_size_MB: 0.9414138793945312
+    raw_FLOPS: null
+    total_params: 24582914
+nlpie/clinical-distilbert:
+  Full:
+    FLOPs: '3.41e+08'
+    full_model_size_GB: 0.49016241170465946
+    full_model_size_MB: 501.9263095855713
+    model_size_GB: 0.24506092816591263
+    model_size_MB: 250.94239044189453
+    n_peft_params: 65781504
+    n_peft_params_perc: 99.9976620114345
+    n_trainable_params: 65783042
+    peft_full_model_size_GB: 0.4901814740151167
+    peft_full_model_size_MB: 501.9458293914795
+    peft_model_size_GB: 0.24506092816591263
+    peft_model_size_MB: 250.94239044189453
+    raw_FLOPS: 340649472.0
+    total_params: 65783042
+  IA3:
+    FLOPs: null
+    full_model_size_GB: 0.49016241170465946
+    full_model_size_MB: 501.9263095855713
+    model_size_GB: 0.24506092816591263
+    model_size_MB: 250.94239044189453
+    n_peft_params: 622848
+    n_peft_params_perc: 0.9468215227869821
+    n_trainable_params: 624386
+    peft_full_model_size_GB: 0.249768303707242
+    peft_full_model_size_MB: 255.76274299621582
+    peft_model_size_GB: 0.0023260191082954407
+    peft_model_size_MB: 2.3818435668945312
+    raw_FLOPS: null
+    total_params: 65783042
+  LORA:
+    FLOPs: null
+    full_model_size_GB: 0.49016241170465946
+    full_model_size_MB: 501.9263095855713
+    model_size_GB: 0.24506092816591263
+    model_size_MB: 250.94239044189453
+    n_peft_params: 811776
+    n_peft_params_perc: 1.234020159785253
+    n_trainable_params: 813314
+    peft_full_model_size_GB: 0.2511918190866709
+    peft_full_model_size_MB: 257.220422744751
+    peft_model_size_GB: 0.003029830753803253
+    peft_model_size_MB: 3.1025466918945312
+    raw_FLOPS: null
+    total_params: 65783042
+  PREFIX_TUNING:
+    FLOPs: null
+    full_model_size_GB: 0.49016241170465946
+    full_model_size_MB: 501.9263095855713
+    model_size_GB: 0.24506092816591263
+    model_size_MB: 250.94239044189453
+    n_peft_params: 774912
+    n_peft_params_perc: 1.177981401346566
+    n_trainable_params: 776450
+    peft_full_model_size_GB: 0.2508907616138458
+    peft_full_model_size_MB: 256.9121398925781
+    peft_model_size_GB: 0.002892501652240753
+    peft_model_size_MB: 2.9619216918945312
+    raw_FLOPS: null
+    total_params: 65783042
+nlpie/clinical-mobilebert:
+  Full:
+    FLOPs: '1.62e+08'
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
+    model_size_GB: 0.09157849103212357
+    model_size_MB: 93.77637481689453
+    n_peft_params: 24581888
+    n_peft_params_perc: 99.99582636948573
+    n_trainable_params: 24582914
+    peft_full_model_size_GB: 0.18400699365884066
+    peft_full_model_size_MB: 188.42316150665283
     peft_model_size_GB: 0.09157849103212357
     peft_model_size_MB: 93.77637481689453
+    raw_FLOPS: 162006016.0
+    total_params: 24582914
+  IA3:
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
+    model_size_GB: 0.09157849103212357
+    model_size_MB: 93.77637481689453
+    n_peft_params: 58368
+    n_peft_params_perc: 0.23743320258940823
+    n_trainable_params: 59394
+    peft_full_model_size_GB: 0.09255178179591894
+    peft_full_model_size_MB: 94.773024559021
+    peft_model_size_GB: 0.00022125989198684692
+    peft_model_size_MB: 0.22657012939453125
+    raw_FLOPS: null
+    total_params: 24582914
+  LORA:
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
+    model_size_GB: 0.09157849103212357
+    model_size_MB: 93.77637481689453
+    n_peft_params: 221184
+    n_peft_params_perc: 0.8997468729703891
+    n_trainable_params: 222210
+    peft_full_model_size_GB: 0.09379831608384848
+    peft_full_model_size_MB: 96.04947566986084
+    peft_model_size_GB: 0.0008277967572212219
+    peft_model_size_MB: 0.8476638793945312
+    raw_FLOPS: null
+    total_params: 24582914
+  PREFIX_TUNING:
+    FLOPs: null
+    full_model_size_GB: 0.18358021322637796
+    full_model_size_MB: 187.98613834381104
+    model_size_GB: 0.09157849103212357
+    model_size_MB: 93.77637481689453
+    n_peft_params: 245760
+    n_peft_params_perc: 0.9997187477448768
+    n_trainable_params: 246786
+    peft_full_model_size_GB: 0.09386538527905941
+    peft_full_model_size_MB: 96.11815452575684
+    peft_model_size_GB: 0.0009193494915962219
+    peft_model_size_MB: 0.9414138793945312
+    raw_FLOPS: null
     total_params: 24582914
 nlpie/distil-biobert:
   Full:
-    full_model_size_GB: 0.49018238950520754
-    full_model_size_MB: 501.9467668533325
+    FLOPs: '3.41e+08'
+    full_model_size_GB: 0.4901786223053932
+    full_model_size_MB: 501.94290924072266
     model_size_GB: 0.24506665021181107
     model_size_MB: 250.94824981689453
     n_peft_params: 65783040
     n_peft_params_perc: 99.99766206602405
-    peft_full_model_size_GB: 0.49018238950520754
-    peft_full_model_size_MB: 501.9467668533325
+    n_trainable_params: 65784578
+    peft_full_model_size_GB: 0.49021007865667343
+    peft_full_model_size_MB: 501.9751205444336
     peft_model_size_GB: 0.24506665021181107
     peft_model_size_MB: 250.94824981689453
+    raw_FLOPS: 340649472.0
     total_params: 65784578
   IA3:
-    full_model_size_GB: 0.49018238950520754
-    full_model_size_MB: 501.9467668533325
+    FLOPs: null
+    full_model_size_GB: 0.4901786223053932
+    full_model_size_MB: 501.94290924072266
     model_size_GB: 0.24506665021181107
     model_size_MB: 250.94824981689453
     n_peft_params: 32256
     n_peft_params_perc: 0.04903276874406643
-    peft_full_model_size_GB: 0.49018238950520754
-    peft_full_model_size_MB: 501.9467668533325
-    peft_model_size_GB: 0.24506665021181107
-    peft_model_size_MB: 250.94824981689453
+    n_trainable_params: 33794
+    peft_full_model_size_GB: 0.24537800624966621
+    peft_full_model_size_MB: 251.2670783996582
+    peft_model_size_GB: 0.00012589246034622192
+    peft_model_size_MB: 0.12891387939453125
+    raw_FLOPS: null
     total_params: 65784578
   LORA:
-    full_model_size_GB: 0.49018238950520754
-    full_model_size_MB: 501.9467668533325
+    FLOPs: null
+    full_model_size_GB: 0.4901786223053932
+    full_model_size_MB: 501.94290924072266
     model_size_GB: 0.24506665021181107
     model_size_MB: 250.94824981689453
     n_peft_params: 147456
     n_peft_params_perc: 0.2241497999728751
-    peft_full_model_size_GB: 0.49018238950520754
-    peft_full_model_size_MB: 501.9467668533325
-    peft_model_size_GB: 0.24506665021181107
-    peft_model_size_MB: 250.94824981689453
+    n_trainable_params: 148994
+    peft_full_model_size_GB: 0.246243167668581
+    peft_full_model_size_MB: 252.15300369262695
+    peft_model_size_GB: 0.0005550459027290344
+    peft_model_size_MB: 0.5683670043945312
+    raw_FLOPS: null
     total_params: 65784578
   PREFIX_TUNING:
-    full_model_size_GB: 0.49018238950520754
-    full_model_size_MB: 501.9467668533325
+    FLOPs: null
+    full_model_size_GB: 0.4901786223053932
+    full_model_size_MB: 501.94290924072266
     model_size_GB: 0.24506665021181107
     model_size_MB: 250.94824981689453
     n_peft_params: 92160
     n_peft_params_perc: 0.14009362498304695
-    peft_full_model_size_GB: 0.49018238950520754
-    peft_full_model_size_MB: 501.9467668533325
-    peft_model_size_GB: 0.24506665021181107
-    peft_model_size_MB: 250.94824981689453
-    total_params: 65784578
-  PROMPT_TUNING:
-    full_model_size_GB: 0.49018238950520754
-    full_model_size_MB: 501.9467668533325
-    model_size_GB: 0.24506665021181107
-    model_size_MB: 250.94824981689453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.011674468748587245
-    peft_full_model_size_GB: 0.49018238950520754
-    peft_full_model_size_MB: 501.9467668533325
-    peft_model_size_GB: 0.24506665021181107
-    peft_model_size_MB: 250.94824981689453
-    total_params: 65784578
-  P_TUNING:
-    full_model_size_GB: 0.49018238950520754
-    full_model_size_MB: 501.9467668533325
-    model_size_GB: 0.24506665021181107
-    model_size_MB: 250.94824981689453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.3370029978758851
-    peft_full_model_size_GB: 0.49018238950520754
-    peft_full_model_size_MB: 501.9467668533325
-    peft_model_size_GB: 0.24506665021181107
-    peft_model_size_MB: 250.94824981689453
+    n_trainable_params: 93698
+    peft_full_model_size_GB: 0.24581381864845753
+    peft_full_model_size_MB: 251.7133502960205
+    peft_model_size_GB: 0.0003490522503852844
+    peft_model_size_MB: 0.35742950439453125
+    raw_FLOPS: null
     total_params: 65784578
 nlpie/tiny-biobert:
   Full:
-    full_model_size_GB: 0.10341165866702795
-    full_model_size_MB: 105.89353847503662
+    FLOPs: '3.66e+07'
+    full_model_size_GB: 0.10340783279389143
+    full_model_size_MB: 105.88962078094482
     model_size_GB: 0.051687516272068024
     model_size_MB: 52.928016662597656
     n_peft_params: 13874136
     n_peft_params_perc: 99.99548821089688
-    peft_full_model_size_GB: 0.10341165866702795
-    peft_full_model_size_MB: 105.89353847503662
+    n_trainable_params: 13874762
+    peft_full_model_size_GB: 0.10343064367771149
+    peft_full_model_size_MB: 105.91297912597656
     peft_model_size_GB: 0.051687516272068024
     peft_model_size_MB: 52.928016662597656
+    raw_FLOPS: 36609456.0
     total_params: 13874762
   IA3:
-    full_model_size_GB: 0.10341165866702795
-    full_model_size_MB: 105.89353847503662
+    FLOPs: null
+    full_model_size_GB: 0.10340783279389143
+    full_model_size_MB: 105.88962078094482
     model_size_GB: 0.051687516272068024
     model_size_MB: 52.928016662597656
     n_peft_params: 8544
     n_peft_params_perc: 0.06157943465985218
-    peft_full_model_size_GB: 0.10341165866702795
-    peft_full_model_size_MB: 105.89353847503662
-    peft_model_size_GB: 0.051687516272068024
-    peft_model_size_MB: 52.928016662597656
+    n_trainable_params: 9170
+    peft_full_model_size_GB: 0.05179805774241686
+    peft_full_model_size_MB: 53.04121112823486
+    peft_model_size_GB: 3.416091203689575e-05
+    peft_model_size_MB: 0.03498077392578125
+    raw_FLOPS: null
     total_params: 13874762
   LORA:
-    full_model_size_GB: 0.10341165866702795
-    full_model_size_MB: 105.89353847503662
+    FLOPs: null
+    full_model_size_GB: 0.10340783279389143
+    full_model_size_MB: 105.88962078094482
     model_size_GB: 0.051687516272068024
     model_size_MB: 52.928016662597656
-    n_peft_params: 39936
-    n_peft_params_perc: 0.2878319642527922
-    peft_full_model_size_GB: 0.10341165866702795
-    peft_full_model_size_MB: 105.89353847503662
-    peft_model_size_GB: 0.051687516272068024
-    peft_model_size_MB: 52.928016662597656
+    n_peft_params: 59904
+    n_peft_params_perc: 0.43174794637918834
+    n_trainable_params: 60530
+    peft_full_model_size_GB: 0.052191068418323994
+    peft_full_model_size_MB: 53.44365406036377
+    peft_model_size_GB: 0.00022549182176589966
+    peft_model_size_MB: 0.23090362548828125
+    raw_FLOPS: null
     total_params: 13874762
   PREFIX_TUNING:
-    full_model_size_GB: 0.10341165866702795
-    full_model_size_MB: 105.89353847503662
+    FLOPs: null
+    full_model_size_GB: 0.10340783279389143
+    full_model_size_MB: 105.88962078094482
     model_size_GB: 0.051687516272068024
     model_size_MB: 52.928016662597656
     n_peft_params: 24960
     n_peft_params_perc: 0.17989497765799514
-    peft_full_model_size_GB: 0.10341165866702795
-    peft_full_model_size_MB: 105.89353847503662
-    peft_model_size_GB: 0.051687516272068024
-    peft_model_size_MB: 52.928016662597656
+    n_trainable_params: 25586
+    peft_full_model_size_GB: 0.0519139114767313
+    peft_full_model_size_MB: 53.15984535217285
+    peft_model_size_GB: 9.531527757644653e-05
+    peft_model_size_MB: 0.09760284423828125
+    raw_FLOPS: null
     total_params: 13874762
-  PROMPT_TUNING:
-    full_model_size_GB: 0.10341165866702795
-    full_model_size_MB: 105.89353847503662
+nlpie/tiny-clinicalbert:
+  Full:
+    FLOPs: '3.66e+07'
+    full_model_size_GB: 0.10340783279389143
+    full_model_size_MB: 105.88962078094482
     model_size_GB: 0.051687516272068024
     model_size_MB: 52.928016662597656
-    n_peft_params: 3120
-    n_peft_params_perc: 0.022486872207249393
-    peft_full_model_size_GB: 0.10341165866702795
-    peft_full_model_size_MB: 105.89353847503662
+    n_peft_params: 13874136
+    n_peft_params_perc: 99.99548821089688
+    n_trainable_params: 13874762
+    peft_full_model_size_GB: 0.10343064367771149
+    peft_full_model_size_MB: 105.91297912597656
     peft_model_size_GB: 0.051687516272068024
     peft_model_size_MB: 52.928016662597656
+    raw_FLOPS: 36609456.0
     total_params: 13874762
-  P_TUNING:
-    full_model_size_GB: 0.10341165866702795
-    full_model_size_MB: 105.89353847503662
+  IA3:
+    FLOPs: null
+    full_model_size_GB: 0.10340783279389143
+    full_model_size_MB: 105.88962078094482
     model_size_GB: 0.051687516272068024
     model_size_MB: 52.928016662597656
-    n_peft_params: 99944
-    n_peft_params_perc: 0.720329473038889
-    peft_full_model_size_GB: 0.10341165866702795
-    peft_full_model_size_MB: 105.89353847503662
-    peft_model_size_GB: 0.051687516272068024
-    peft_model_size_MB: 52.928016662597656
+    n_peft_params: 8544
+    n_peft_params_perc: 0.06157943465985218
+    n_trainable_params: 9170
+    peft_full_model_size_GB: 0.05179805774241686
+    peft_full_model_size_MB: 53.04121112823486
+    peft_model_size_GB: 3.416091203689575e-05
+    peft_model_size_MB: 0.03498077392578125
+    raw_FLOPS: null
     total_params: 13874762
+  LORA:
+    FLOPs: null
+    full_model_size_GB: 0.10340783279389143
+    full_model_size_MB: 105.88962078094482
+    model_size_GB: 0.051687516272068024
+    model_size_MB: 52.928016662597656
+    n_peft_params: 59904
+    n_peft_params_perc: 0.43174794637918834
+    n_trainable_params: 60530
+    peft_full_model_size_GB: 0.052191068418323994
+    peft_full_model_size_MB: 53.44365406036377
+    peft_model_size_GB: 0.00022549182176589966
+    peft_model_size_MB: 0.23090362548828125
+    raw_FLOPS: null
+    total_params: 13874762
+  PREFIX_TUNING:
+    FLOPs: null
+    full_model_size_GB: 0.10340783279389143
+    full_model_size_MB: 105.88962078094482
+    model_size_GB: 0.051687516272068024
+    model_size_MB: 52.928016662597656
+    n_peft_params: 24960
+    n_peft_params_perc: 0.17989497765799514
+    n_trainable_params: 25586
+    peft_full_model_size_GB: 0.0519139114767313
+    peft_full_model_size_MB: 53.15984535217285
+    peft_model_size_GB: 9.531527757644653e-05
+    peft_model_size_MB: 0.09760284423828125
+    raw_FLOPS: null
+    total_params: 13874762
+prajjwal1/bert-tiny:
+  Full:
+    FLOPs: '3.18e+06'
+    full_model_size_GB: 0.0327015845105052
+    full_model_size_MB: 33.486422538757324
+    model_size_GB: 0.01633978635072708
+    model_size_MB: 16.73194122314453
+    n_peft_params: 4385920
+    n_peft_params_perc: 99.99411788577663
+    n_trainable_params: 4386178
+    peft_full_model_size_GB: 0.032716053538024426
+    peft_full_model_size_MB: 33.50123882293701
+    peft_model_size_GB: 0.01633978635072708
+    peft_model_size_MB: 16.73194122314453
+    raw_FLOPS: 3182848.0
+    total_params: 4386178
+  IA3:
+    FLOPs: null
+    full_model_size_GB: 0.0327015845105052
+    full_model_size_MB: 33.486422538757324
+    model_size_GB: 0.01633978635072708
+    model_size_MB: 16.73194122314453
+    n_peft_params: 1792
+    n_peft_params_perc: 0.0408556150707974
+    n_trainable_params: 2050
+    peft_full_model_size_GB: 0.016382639296352863
+    peft_full_model_size_MB: 16.775822639465332
+    peft_model_size_GB: 7.636845111846924e-06
+    peft_model_size_MB: 0.00782012939453125
+    raw_FLOPS: null
+    total_params: 4386178
+  LORA:
+    FLOPs: null
+    full_model_size_GB: 0.0327015845105052
+    full_model_size_MB: 33.486422538757324
+    model_size_GB: 0.01633978635072708
+    model_size_MB: 16.73194122314453
+    n_peft_params: 12288
+    n_peft_params_perc: 0.2801527890568965
+    n_trainable_params: 12546
+    peft_full_model_size_GB: 0.016465836204588413
+    peft_full_model_size_MB: 16.861016273498535
+    peft_model_size_GB: 4.6737492084503174e-05
+    peft_model_size_MB: 0.04785919189453125
+    raw_FLOPS: null
+    total_params: 4386178
+  PREFIX_TUNING:
+    FLOPs: null
+    full_model_size_GB: 0.0327015845105052
+    full_model_size_MB: 33.486422538757324
+    model_size_GB: 0.01633978635072708
+    model_size_MB: 16.73194122314453
+    n_peft_params: 5120
+    n_peft_params_perc: 0.11673032877370686
+    n_trainable_params: 5378
+    peft_full_model_size_GB: 0.016404176130890846
+    peft_full_model_size_MB: 16.797876358032227
+    peft_model_size_GB: 2.0034611225128174e-05
+    peft_model_size_MB: 0.02051544189453125
+    raw_FLOPS: null
+    total_params: 4386178
 roberta-base:
   Full:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
+    FLOPs: '6.81e+08'
+    full_model_size_GB: 0.9287754967808723
+    full_model_size_MB: 951.0661087036133
     model_size_GB: 0.46434689313173294
     model_size_MB: 475.49121856689453
     n_peft_params: 124055040
     n_peft_params_perc: 99.524955119318
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
+    n_trainable_params: 124647170
+    peft_full_model_size_GB: 0.9288322664797306
+    peft_full_model_size_MB: 951.1242408752441
     peft_model_size_GB: 0.46434689313173294
     peft_model_size_MB: 475.49121856689453
+    raw_FLOPS: 680683008.0
     total_params: 124647170
   IA3:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
+    FLOPs: null
+    full_model_size_GB: 0.9287754967808723
+    full_model_size_MB: 951.0661087036133
     model_size_GB: 0.46434689313173294
     model_size_MB: 475.49121856689453
     n_peft_params: 64512
     n_peft_params_perc: 0.05175568767425686
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
+    n_trainable_params: 656642
+    peft_full_model_size_GB: 0.46934929490089417
+    peft_full_model_size_MB: 480.6136779785156
+    peft_model_size_GB: 0.002446182072162628
+    peft_model_size_MB: 2.5048904418945312
+    raw_FLOPS: null
     total_params: 124647170
   LORA:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
+    FLOPs: null
+    full_model_size_GB: 0.9287754967808723
+    full_model_size_MB: 951.0661087036133
     model_size_GB: 0.46434689313173294
     model_size_MB: 475.49121856689453
     n_peft_params: 294912
     n_peft_params_perc: 0.23659742936803138
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
+    n_trainable_params: 887042
+    peft_full_model_size_GB: 0.47108015418052673
+    peft_full_model_size_MB: 482.3860778808594
+    peft_model_size_GB: 0.003304488956928253
+    peft_model_size_MB: 3.3837966918945312
+    raw_FLOPS: null
     total_params: 124647170
   PREFIX_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
+    FLOPs: null
+    full_model_size_GB: 0.9287754967808723
+    full_model_size_MB: 951.0661087036133
     model_size_GB: 0.46434689313173294
     model_size_MB: 475.49121856689453
     n_peft_params: 184320
     n_peft_params_perc: 0.14787339335501962
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  PROMPT_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 7680
-    n_peft_params_perc: 0.0061613913897924835
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
-    total_params: 124647170
-  P_TUNING:
-    full_model_size_GB: 0.9287792639806867
-    full_model_size_MB: 951.0699663162231
-    model_size_GB: 0.46434689313173294
-    model_size_MB: 475.49121856689453
-    n_peft_params: 221696
-    n_peft_params_perc: 0.1778588314520097
-    peft_full_model_size_GB: 0.9287792639806867
-    peft_full_model_size_MB: 951.0699663162231
-    peft_model_size_GB: 0.46434689313173294
-    peft_model_size_MB: 475.49121856689453
+    n_trainable_params: 776450
+    peft_full_model_size_GB: 0.4702203255146742
+    peft_full_model_size_MB: 481.50561332702637
+    peft_model_size_GB: 0.002892501652240753
+    peft_model_size_MB: 2.9619216918945312
+    raw_FLOPS: null
     total_params: 124647170

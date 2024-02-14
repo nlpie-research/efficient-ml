@@ -470,7 +470,7 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
         loguru_logger.info(f"Sampling {few_shot_n} samples per class")
         train_datasets = []
         for label in range(num_labels):
-            label_dataset = datasets['train'].filter(lambda x: x[args.label_name] == label).shuffle(seed=42)
+            label_dataset = datasets['train'].filter(lambda x: x[args.label_name] == label).shuffle(seed=args.random_seed)
             num_samples = len(label_dataset)
             # if we have more samples than the few shot n - then we need to sample
             if num_samples >= few_shot_n:
@@ -487,7 +487,7 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
         loguru_logger.info(f"Sampling {args.eval_few_shot_n} samples per class")
         eval_datasets = []
         for label in range(num_labels):
-            label_dataset = datasets['validation'].filter(lambda x: x[args.label_name] == label).shuffle(seed=42)
+            label_dataset = datasets['validation'].filter(lambda x: x[args.label_name] == label).shuffle(seed=args.random_seed)
             num_samples = len(label_dataset)
             # if we have more samples than the few shot n - then we need to sample
             if num_samples >= args.eval_few_shot_n:
@@ -535,7 +535,7 @@ def load_datasets(args:argparse.Namespace, info:DatasetInfo, tokenizer:AutoToken
             loguru_logger.info(f"Sampling {args.few_shot_n} samples per class")
             train_datasets = []
             for label in range(num_labels):
-                label_dataset = dataset['train'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
+                label_dataset = dataset['train'].filter(lambda x: x['labels'] == label).shuffle(seed=args.random_seed)
                 num_samples = len(label_dataset)
                 # if we have more samples than the few shot n - then we need to sample
                 if num_samples >= args.few_shot_n:
@@ -552,7 +552,7 @@ def load_datasets(args:argparse.Namespace, info:DatasetInfo, tokenizer:AutoToken
             loguru_logger.info(f"Sampling {args.eval_few_shot_n} samples per class")
             eval_datasets = []
             for label in range(num_labels):
-                label_dataset = dataset['validation'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
+                label_dataset = dataset['validation'].filter(lambda x: x['labels'] == label).shuffle(seed=args.random_seed)
                 num_samples = len(label_dataset)
                 # if we have more samples than the few shot n - then we need to sample
                 if num_samples >= args.eval_few_shot_n:
@@ -624,7 +624,7 @@ def load_datasets(args:argparse.Namespace, info:DatasetInfo, tokenizer:AutoToken
     if "test" not in dataset:
         
         loguru_logger.info("No test set found. Creating test set from validation set")
-        temp_dataset = dataset["validation"].train_test_split(test_size=0.5, shuffle=True, seed=42)
+        temp_dataset = dataset["validation"].train_test_split(test_size=0.5, shuffle=True, seed=args.random_seed)
         # reassign the test set
         # print(f"temp dataset is: {temp_dataset}")
         dataset["validation"] = temp_dataset["train"]
@@ -1021,7 +1021,8 @@ def main() -> None:
     args = parse_args()    
     args = get_dataset_directory_details(args)
 
-    set_seed(args.seed)
+    # set_seed(args.random_seed)
+    set_seed(42)
 
     # setup params
     data_dir = args.data_dir
@@ -1163,7 +1164,7 @@ def main() -> None:
     #     loguru_logger.info(f"Sampling {few_shot_n} samples per class")
     #     train_datasets = []
     #     for label in range(num_labels):
-    #         label_dataset = tokenized_datasets['train'].filter(lambda x: x['labels'] == label).shuffle(seed=42)
+    #         label_dataset = tokenized_datasets['train'].filter(lambda x: x['labels'] == label).shuffle(seed=args.random_seed)
     #         num_samples = len(label_dataset)
     #         # if we have more samples than the few shot n - then we need to sample
     #         if num_samples >= few_shot_n:
