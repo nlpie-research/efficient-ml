@@ -1,6 +1,12 @@
 import transformers as ts
 import datasets as ds
 
+# SET DIRS
+# Set directories to wherever the data is stored after preprocessing based on:
+
+raw_data_dir = "/mnt/sdd/niallt/bio-lm/data/tasks/I2B22014NER/" #CHANGEME
+save_data_dir = "/mnt/sdd/niallt/bio-lm/data/tasks/i2b2-2014_hf_dataset/" #CHANGEME
+
 allLabels = []
 
 dataDict = {}
@@ -41,10 +47,11 @@ def load_ner_dataset(path, subset):
 
   dataDict[subset]["tokens"] = sentences
   dataDict[subset]["ner_tags_str"] = labels
-  
-load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22014NER/train.txt.conll", "train")
-load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22014NER/dev.txt.conll", "validation")
-load_ner_dataset("/mnt/sdd/niallt/bio-lm/data/tasks/I2B22014NER/test.txt.conll", "test")
+
+# Set directories to wherever the data is stored after preprocessing based on: https://github.com/facebookresearch/bio-lm/tree/main/preprocessing
+load_ner_dataset(f"{raw_data_dir}/train.txt.conll", "train")
+load_ner_dataset(f"{raw_data_dir}/dev.txt.conll", "validation")
+load_ner_dataset(f"{raw_data_dir}/test.txt.conll", "test")
 
 allLabels = list(set(allLabels))
 label_to_index = {label: index for index, label in enumerate(allLabels)}
@@ -58,5 +65,5 @@ dataDict["info"] = ds.Dataset.from_dict({"all_ner_tags": [allLabels]})
 dataset = ds.DatasetDict(dataDict)
 
 print(dataset)
-
-dataset.save_to_disk("/mnt/sdd/niallt/bio-lm/data/tasks/i2b2-2014_hf_dataset/")
+# Set location to save the dataset to - this will be a huggingface dataset
+dataset.save_to_disk(f"{save_data_dir}")
