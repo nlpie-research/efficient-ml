@@ -26,7 +26,7 @@ for model in "${model_name_or_path[@]}"
                                 --eval_every_steps 200 \
                                 --log_save_dir $log_save_dir \
                                 --ckpt_save_dir $ckpt_save_dir \
-                                --learning_rate 0.00005 \
+                                --learning_rate 1e-3 \
                                 --lora_rank 16 \
                                 --lora_alpha 32 \
                                 --time_budget $time_budget \

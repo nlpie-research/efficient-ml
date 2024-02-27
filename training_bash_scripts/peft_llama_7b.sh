@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # decapoda-research/llama-7b-hf ybelkada/falcon-7b-sharded-bf16 tiiuae/falcon-7b-instruct
-model_name_or_path=(openlm-research/open_llama_3b                                                                
+model_name_or_path=(
+    meta-llama/Llama-2-7b-hf                                                                
                      )
-task=icd9-triage
-num_sample=(64)
-peft_methods=(LORA)
+task=mimic-mp
+num_sample=(4096)
+peft_methods=(PROMPT_TUNING)
 max_epochs=5
-gpu=3
-data_dir=/mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/no_category_in_text/
-eval_data_dir=/mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/no_category_in_text/
+gpu=1
+log_save_dir=/mnt/sdh/effecient_ml/fewshot_budget/logs
+ckpt_save_dir=/mnt/sdh/effecient_ml/fewshot_budget/ckpts
 for model in "${model_name_or_path[@]}"
     do
     for peft_method in "${peft_methods[@]}"
@@ -17,14 +18,20 @@ for model in "${model_name_or_path[@]}"
             do
             CUDA_VISIBLE_DEVICES="$gpu" python peft_trainer.py --model_name_or_path "$model" \
                                     --max_epochs "$max_epochs" \
-                                    --training_data_dir "$data_dir" \
-                                    --eval_data_dir "$eval_data_dir" \
                                     --task "$task" \
                                     --few_shot_n "$num" \
                                     --peft_method "$peft_method" \
-                                    --train_batch_size 2 \
-                                    --eval_batch_size 2 \
-                                    --eight_bit_training
+                                    --train_batch_size 1 \
+                                    --eval_batch_size 1 \
+                                    --learning_rate 0.015 \
+                                    --lora_rank 16 \
+                                    --lora_alpha 32 \
+                                    --gradient_accumulation_steps 16 \
+                                    --evaluation_strategy epoch \
+                                    --saving_strategy epoch \
+                                    --scheduler_type constant \
+                                    --log_save_dir $log_save_dir \
+                                    --ckpt_save_dir $ckpt_save_dir
         done
     done
 done

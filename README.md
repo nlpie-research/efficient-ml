@@ -19,9 +19,9 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 [![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
+<!-- [![Forks][forks-shield]][forks-url] -->
+<!-- [![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url] -->
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
@@ -34,19 +34,19 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">project_title</h3>
+<h3 align="center">Efficiency at Scale: Investigating the Performance of Diminutive Language Models in Clinical Tasks</h3>
 
   <p align="center">
-    project_description
+    Utility of different Parameter Efficient Fine-tuning (PEFT) strategies for clinical NLP tasks with models of varying scales and domain pre-training.
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
+    <!-- <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/github_username/repo_name">View Demo</a>
     ·
     <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
+    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a> -->
   </p>
 </div>
 
@@ -58,9 +58,9 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
+      <!-- <ul>
         <li><a href="#built-with">Built With</a></li>
-      </ul>
+      </ul> -->
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
@@ -70,7 +70,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
+    <!-- <li><a href="#roadmap">Roadmap</a></li> -->
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -83,8 +83,6 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
 This repository contains the code for the following paper: Efficiency at Scale: Investigating the Performance of Diminutive Language Models in Clinical Tasks, find the paper [here](...). 
 
 We explored the utility of different Parameter Efficient Fine-tuning (PEFT) strategies for clinical NLP tasks. We used the models of varying scales and domain pre-training to determine the interaction of different methods and downstream task performance. We also used the following datasets: MIMIC-III, and i2b2.
@@ -95,27 +93,19 @@ We explored the utility of different Parameter Efficient Fine-tuning (PEFT) stra
 
 
 
-### Built With
+<!-- ### Built With
 
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+
 * [![Python][Python.org]][Python-url] 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+This is a fairly simple repo which utilises the HuggingFace `transformers` and `peft` libraries to fine-tune models on clinical NLP tasks. The code is designed to be run on a local machine, and the datasets are not provided.
 
 ### Prerequisites
 
@@ -136,7 +126,7 @@ All of the clinical downstream tasks were performed on the MIMIC-III and i2b2 da
 These datasets do require data agreements and will require users to request access to the data prior to use.
 
 ### Pre-processing
-We follow the pre-processing steps below to prepare datasets locally for use with the scripts provided. 
+We follow the pre-processing steps below to prepare datasets locally for use with the scripts provided. It is a bit clunky, but you eventually want all datasets to land in the same  global dataset directory.
 
 #### MIMIC-III
 To prepare the clinical outcome tasks: mortality prediction (MIMIC MP), length of stay prediction (MIIMC LOS), we follow the steps provided by the original authors [here](https://github.com/bvanaken/clinical-outcome-prediction#create-admission-notes-for-outcome-prediction-from-mimic-iii). 
@@ -155,8 +145,94 @@ python load_i2b2_2010_ner.py
 At present, you will need to change the directory paths in the script to point to the correct location of the data on your local machine, as well as the save location for the new HF dataset.
 
 
+### Dataset directory structure
+The directory structure for the datasets should be as follows:
+
+```
+datasets
+├── I2B22010NER_hf_dataset
+│   ├── dataset_dict.json
+│   ├── info
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   ├── test
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   ├── train
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   └── validation
+│       ├── dataset_info.json
+│       └── state.json
+├── i2b2-2010-RE
+│   ├── dataset_dict.json
+│   ├── train
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   └── validation
+│       ├── dataset_info.json
+│       └── state.json
+├── i2b2-2012_hf_dataset
+│   ├── dataset_dict.json
+│   ├── info
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   ├── test
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   ├── train
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   └── validation
+│       ├── dataset_info.json
+│       └── state.json
+├── i2b2-2014_hf_dataset
+│   ├── dataset_dict.json
+│   ├── info
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   ├── test
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   ├── train
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   └── validation
+│       ├── dataset_info.json
+│       └── state.json
+├── icd9-triage
+│   ├── test.csv
+│   ├── train.csv
+│   └── valid.csv
+├── MedNLI
+│   ├── dataset_dict.json
+│   ├── test
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   ├── train
+│   │   ├── dataset_info.json
+│   │   └── state.json
+│   └── validation
+│       ├── dataset_info.json
+│       └── state.json
+└── mimic3-clinical-outcomes
+    ├── los
+    │   ├── LOS_WEEKS_adm_test.csv
+    │   ├── LOS_WEEKS_adm_train.csv
+    │   ├── LOS_WEEKS_adm_val.csv
+    │   ├── test.csv
+    │   ├── train.csv
+    │   └── valid.csv
+    ├── mp
+    │   ├── test.csv
+    │   ├── train.csv
+    │   └── valid.csv
+```
 
 ### Training
+
+We use a relatively simple training script to fine-tune the models on the clinical tasks. The script is designed to be run from the command line, and the user can specify the model, task, and PEFT strategy to use. 
+
 
 
 

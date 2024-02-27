@@ -18,10 +18,10 @@ model_name_or_path=(
                     )
 peft_methods=(LORA)
 tasks=(mimic-mp)
-max_epochs=5
-gpu=1
-log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/sanity_checking/logs
-ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/sanity_checking/ckpts
+max_epochs=1
+gpu=2
+log_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/debugging/logs
+ckpt_save_dir=/mnt/sdd/efficient_ml_data/saved_models/peft/debugging/ckpts
 for task in "${tasks[@]}"
     do
     for model in "${model_name_or_path[@]}"
@@ -39,8 +39,7 @@ for task in "${tasks[@]}"
                 --task "$task" \
                 --peft_method "$peft_method" \
                 --log_save_dir $log_save_dir \
-                --ckpt_save_dir $ckpt_save_dir \
-                --few_shot_n=256
+                --ckpt_save_dir $ckpt_save_dir
         done
     done
 done

@@ -6,7 +6,7 @@ max_epochs=5
 log_save_dir=/mnt/sdh/effecient_ml/logs_multiseed
 ckpt_save_dir=/mnt/sdh/effecient_ml/ckpts_multiseed
 pending_tasks_file=./training_bash_scripts/all_pending_tasks.csv
-random_seeds=(12 34 56)
+random_seeds=(12)
 for pt in $(cat "$pending_tasks_file")
 do
     IFS=$',' read -r model_name_or_path task peft_method <<< "$pt"

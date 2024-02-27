@@ -6,12 +6,12 @@
 model=$1
 gpu=$2
 # lora_ranks=($3)
-peft_method="LORA"
-task="mimic-mp"
+peft_method="LORA" 
+task="i2b2-2010-RE" # i2b2-2010-RE | mimic-mp
 max_epochs=5
 log_save_dir="/mnt/sdd/efficient_ml_data/saved_models/peft/Optuna/logs"
 ckpt_save_dir="/mnt/sdd/efficient_ml_data/saved_models/peft/Optuna/ckpts"
-lora_ranks=(8 16 32 64 128)
+lora_ranks=(8 16)
 for lora_rank in "${lora_ranks[@]}"; 
 do
     export CUDA_VISIBLE_DEVICES="$gpu"

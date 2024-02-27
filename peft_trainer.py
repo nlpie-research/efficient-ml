@@ -509,7 +509,7 @@ def load_dataset_from_csv(args:argparse.Namespace, tokenizer:AutoTokenizer) -> t
     # tokenize function
     
     # # apply to dataset
-    #FIXME - this is only valid for triage task - need to make more general
+    
     tokenized_datasets = datasets.map(
         tokenize_function,
         batched=True,
@@ -1045,7 +1045,7 @@ def main() -> None:
     # define some model specific params for logs etc - this is mainly for custom local models
     # TODO clean this up/improve
     # THIS IS ALL VERY CRUDE AND DEPENDENT ON HAVING TRAINED USING THE SCRIPTS INSIDE THIS REPO - 
-    # forward slashes really matter for the naming convention make sure to append the path with a forward slash
+    # forward slashes really matter for the naming convention make sure to append the path with just one forward slash
     model_name = get_model_name(model_name_or_path)
     loguru_logger.info(f"######### Model name is: {model_name}######################")
     
@@ -1266,7 +1266,7 @@ def main() -> None:
         print(f"peft config is: {peft_config}")
     
     # if we are using peft and not running optuna, get peft model
-    if not optuna and peft_method != "Full":
+    if not optuna and peft_method != "Full" and peft_method != "Frozen_PLM":
 
         model = get_peft_model(model, peft_config)
         model.print_trainable_parameters()
@@ -1338,10 +1338,6 @@ def main() -> None:
         warmup_steps = 0.06 * (len(tokenized_datasets['train'])/train_batch_size * min(num_epochs, 5)),
         learning_rate = lr,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
-
-        # use_ipex = args.use_ipex # for cpu only
-        # remove_unused_columns=False, # at moment the peft model changes the output format and this causes issues with the trainer
-        # label_names = ["labels"],#FIXME - this is a hack to get around the fact that the peft model changes the output format and this causes issues with the trainer
     )
     
     callbacks = []

@@ -1,1 +1,8 @@
-nlpie/tiny-biobert,i2b2-2010-RE,IA3
+/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_note_loss_only/sampled_250000/26-02-2024--15-10/checkpoint-52000/,i2b2-2010-RE,LORA
+/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_mlm_loss_only/sampled_250000/26-02-2024--15-12/checkpoint-56000/,i2b2-2010-RE,LORA
+/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_note_loss_only/sampled_250000/26-02-2024--15-10/checkpoint-52000/,i2b2-2010-RE,Frozen_PLM
+/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_mlm_loss_only/sampled_250000/26-02-2024--15-12/checkpoint-56000/,i2b2-2010-RE,Frozen_PLM
+/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_note_loss_only/sampled_250000/26-02-2024--15-10/checkpoint-52000/,mimic-mp,LORA
+/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_mlm_loss_only/sampled_250000/26-02-2024--15-12/checkpoint-56000/,mimic-mp,LORA
+/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_note_loss_only/sampled_250000/26-02-2024--15-10/checkpoint-52000/,mimic-mp,Frozen_PLM
+/mnt/sdc/niallt/saved_models/language_modelling/mimic/roberta-base-mimic-note-custom_pretraining_max_epoch_2_mlm_loss_only/sampled_250000/26-02-2024--15-12/checkpoint-56000/,mimic-mp,Frozen_PLM
