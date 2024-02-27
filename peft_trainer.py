@@ -150,11 +150,11 @@ def parse_args() -> argparse.Namespace:
                         type=str,
                         help = "The data path containing the dataset to use. These datasets use the load_datasets and DatasetInfo method to load the data")
     parser.add_argument("--training_data_dir",
-                        default = "/mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/no_category_in_text",# triage = /mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/
+                        default = "./datasets/",
                         type=str,
                         help = "The data path containing the dataset to use")
     parser.add_argument("--eval_data_dir",
-                        default = "/mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/no_category_in_text",# triage = /mnt/sdc/niallt/mimic_iii/processed/HADM_ID_split/icd9-triage/
+                        default = "./datasets/",
                         type=str,
                         help = "The data path containing the dataset to use")
     parser.add_argument("--cache_dir",
@@ -182,11 +182,11 @@ def parse_args() -> argparse.Namespace:
                         type=str,
                         help = "col name for the column containing the text")
     parser.add_argument("--log_save_dir",
-                        default = "/mnt/sdc/niallt/saved_models/peft_training/logs",
+                        default = "./logs/",
                         type=str,
                         help = "The data path to save tb log files to")
     parser.add_argument("--ckpt_save_dir",
-                        default = "/mnt/sdc/niallt/saved_models/peft_training/ckpts",
+                        default = "./ckpts",
                         type=str,
                         help = "The data path to save trained ckpts to")
     parser.add_argument("--max_length",
@@ -226,8 +226,7 @@ def parse_args() -> argparse.Namespace:
                         type=int,
                         help = "the maximum number of epochs to train for")
     parser.add_argument("--model_name_or_path",
-                        default= "/mnt/sdc/niallt/saved_models/language_modelling/mimic/mimic-roberta-base/sampled_250000/22-12-2022--12-45/checkpoint-100000",
-                        # 'allenai/biomed_roberta_base',#'simonlevine/biomed_roberta_base-4096-speedfix', # 'bert-base-uncased', #emilyalsentzer/Bio_ClinicalBERT'
+                        default= "roberta-base",                        
                         type=str,
                         help="Encoder model to be used.")
     parser.add_argument("--dropout",
@@ -381,6 +380,19 @@ def get_dataset_columns(key:str, task_to_keys:dict) -> tuple[str,str]:
         return ('text', None)
 
 def get_model_name(model_name_or_path:str) -> str:
+    
+    """ 
+    Function to derive a friendly model name from locally saved models. This is very specific to our local machine
+    this should be changed to be more general, but for now if you provide a general HF model it should just pull the last part of the path
+    
+    
+    args:
+        model_name_or_path: str - the path to the model
+        
+    returns:
+        model_name: str - the name of the model to be used for saving etc
+    
+    """
     if "saved_models" in model_name_or_path:
         if "declutr" in model_name_or_path:
             if "few_epoch" in model_name_or_path:
@@ -403,6 +415,13 @@ def get_model_name(model_name_or_path:str) -> str:
     return model_name
 
 def get_dataset_directory_details(args:argparse.Namespace) -> argparse.Namespace:
+    """ 
+    Function to read in dataset details from a yaml file and add them to the args namespace
+    
+    Args:
+    args: argparse.Namespace - the namespace containing the arguments
+    
+    """
 
     with open('datasets.yaml', 'r') as f:
         datasets = yaml.load(f, yaml.FullLoader)
