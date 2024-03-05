@@ -1,17 +1,27 @@
-# model_name_or_path=(nlpie/bio-mobilebert
-#                     nlpie/tiny-biobert
-#                     nlpie/distil-biobert
-#                     dmis-lab/biobert-v1.1
-#                     roberta-base
-#                     )
-model_name_or_path=(roberta-base)
+analysis_number=$1
+if [ "$analysis_number" -eq 1 ]; then
+    model_name_or_path=(nlpie/tiny-biobert
+                    )
+    max_epochs=12
+    time_budget=(2000)
+elif [ "$analysis_number" -eq 2 ]; then
+    model_name_or_path=(nlpie/bio-mobilebert
+                    nlpie/bio-distilbert-uncased
+                    )
+    max_epochs=5
+    time_budget=(2000)
+elif [ "$analysis_number" -eq 3 ]; then
+    model_name_or_path=(dmis-lab/biobert-v1.1)
+    max_epochs=7
+    time_budget=(6000)
+fi
+
 peft_methods=(LORA Full)
 task=mimic-mp
-max_epochs=6
-time_budget=(6000) # 12 hours = 43200 seconds 
-gpu=0
-log_save_dir=/mnt/sdh/effecient_ml/tb_2000/logs
-ckpt_save_dir=/mnt/sdh/effecient_ml/tb_2000/ckpts
+# time_budget=(2000) # 12 hours = 43200 seconds 
+gpu=$analysis_number
+log_save_dir=/mnt/sdh/effecient_ml/tb_2000_optim_LR/logs
+ckpt_save_dir=/mnt/sdh/effecient_ml/tb_2000_optim_LR/ckpts
 for model in "${model_name_or_path[@]}"
 do
     for peft_method in "${peft_methods[@]}"
@@ -45,21 +55,27 @@ do
                         # --eight_bit_training
                 fi
             else
+                # Load best LORA params for model type
+                model_params=$(grep $model /mnt/sdd/efficient_ml_data/optuna_dbs/Runs/best_params_LORA.csv)
+                IFS=',' read -r -a array <<< "$model_params"
+                lora_rank=${array[1]}
+                lora_alpha=${array[2]}
+                lora_dropout=${array[3]}
+                learning_rate=${array[4]}
                 if [ "$peft_method" == "LORA" ]; then
                     # Load best LORA params for model type
-                    model_params=$(grep $model /mnt/sdd/efficient_ml_data/optuna_dbs/Runs/best_params_LORA.csv)
-                    IFS=',' read -r -a array <<< "$model_params"
-                    lora_rank=${array[1]}
-                    lora_alpha=${array[2]}
-                    lora_dropout=${array[3]}
-                    learning_rate=${array[4]}
-                    echo Running ${model} with 
+                    # model_params=$(grep $model /mnt/sdd/efficient_ml_data/optuna_dbs/Runs/best_params_LORA.csv)
+                    # IFS=',' read -r -a array <<< "$model_params"
+                    # lora_rank=${array[1]}
+                    # lora_alpha=${array[2]}
+                    # lora_dropout=${array[3]}
+                    # learning_rate=${array[4]}
+                    echo Running ${model} - LORA with 
                     echo -e "\t"rank=${lora_rank}
                     echo -e "\t"alpha=${lora_alpha}
                     echo -e "\t"dropout=${lora_dropout}
                     echo -e "\t"lr=${learning_rate}
                     echo
-                    
                     python peft_trainer.py \
                         --model_name_or_path "$model" \
                         --max_epochs "$max_epochs" \
@@ -77,6 +93,9 @@ do
                         --learning_rate $learning_rate
                     
                 else
+                    echo Running ${model} - Full with 
+                    echo -e "\t"lr=${learning_rate}
+                    echo
                     python peft_trainer.py \
                         --model_name_or_path "$model" \
                         --max_epochs "$max_epochs" \
@@ -87,7 +106,8 @@ do
                         --peft_method $peft_method \
                         --log_save_dir $log_save_dir \
                         --ckpt_save_dir $ckpt_save_dir \
-                        --time_budget $tb
+                        --time_budget $tb \
+                        --learning_rate $learning_rate
                 fi  
             fi
         done

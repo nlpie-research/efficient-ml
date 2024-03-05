@@ -1248,7 +1248,8 @@ def main() -> None:
     # here
     if peft_method == "Full":
         loguru_logger.info("Using full finetuning")
-        lr = 3e-5
+        # lr = 3e-5
+        lr = args.learning_rate
         peft_config = None
     elif peft_method == "Frozen_PLM":
         loguru_logger.info("Using frozen PLM")
