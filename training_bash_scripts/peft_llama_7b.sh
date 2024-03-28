@@ -5,7 +5,7 @@ model_name_or_path=(
                      )
 task=mimic-mp
 num_sample=(4096)
-peft_methods=(PROMPT_TUNING)
+peft_methods=(Frozen_PLM)
 max_epochs=5
 gpu=1
 log_save_dir=/mnt/sdh/effecient_ml/fewshot_budget/logs
@@ -23,7 +23,7 @@ for model in "${model_name_or_path[@]}"
                                     --peft_method "$peft_method" \
                                     --train_batch_size 1 \
                                     --eval_batch_size 1 \
-                                    --learning_rate 0.015 \
+                                    --learning_rate 0.00005 \
                                     --lora_rank 16 \
                                     --lora_alpha 32 \
                                     --gradient_accumulation_steps 16 \
