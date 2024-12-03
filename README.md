@@ -309,15 +309,19 @@ Distributed under the MIT License. See [LICENCE](./LICENSE) for more information
 ## Citation
 
 ```
-@misc{taylor2024efficiency,
-      title={Efficiency at Scale: Investigating the Performance of Diminutive Language Models in Clinical Tasks}, 
-      author={Niall Taylor and Upamanyu Ghose and Omid Rohanian and Mohammadmahdi Nouriborji and Andrey Kormilitzin and David Clifton and Alejo Nevado-Holgado},
-      year={2024},
-      eprint={2402.10597},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
+@article{TAYLOR2024103002,
+title = {Efficiency at scale: Investigating the performance of diminutive language models in clinical tasks},
+journal = {Artificial Intelligence in Medicine},
+volume = {157},
+pages = {103002},
+year = {2024},
+issn = {0933-3657},
+doi = {https://doi.org/10.1016/j.artmed.2024.103002},
+url = {https://www.sciencedirect.com/science/article/pii/S0933365724002446},
+author = {Niall Taylor and Upamanyu Ghose and Omid Rohanian and Mohammadmahdi Nouriborji and Andrey Kormilitzin and David A. Clifton and Alejo Nevado-Holgado},
+keywords = {Large language models, Artificial intelligence, PEFT, Fine-tuning, NLP},
+abstract = {The entry of large language models (LLMs) into research and commercial spaces has led to a trend of ever-larger models, with initial promises of generalisability. This was followed by a widespread desire to downsize and create specialised models without the need for complete fine-tuning, using Parameter Efficient Fine-tuning (PEFT) methods. We present an investigation into the suitability of different PEFT methods to clinical decision-making tasks, across a range of model sizes, including extremely small models with as few as 25 million parameters. Our analysis shows that the performance of most PEFT approaches varies significantly from one task to another, with the exception of LoRA, which maintains relatively high performance across all model sizes and tasks, typically approaching or matching full fine-tuned performance. The effectiveness of PEFT methods in the clinical domain is evident, particularly for specialised models which can operate on low-cost, in-house computing infrastructure. The advantages of these models, in terms of speed and reduced training costs, dramatically outweighs any performance gain from large foundation LLMs. Furthermore, we highlight how domain-specific pre-training interacts with PEFT methods and model size, finding the domain pre-training to be particularly important in smaller models and discuss how these factors interplay to provide the best efficiency-performance trade-off. Full code available at: https://github.com/nlpie-research/efficient-ml.}
 }
-
 ```
 
 <!-- CONTACT -->
